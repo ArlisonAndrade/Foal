@@ -17,7 +17,7 @@ export const CENARIOS_CFGS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Aproxima-se com firmeza, ajusta o material com coordenação e reage bem ao temperamento do cavalo." },
-      { letra: "B", valor: 1.4, texto: "Demonstra leve hesitação ou necessita de correção do monitor, mas mantém a execução básica." },
+      { letra: "B", valor: 0.8, texto: "Demonstra leve hesitação ou necessita de correção do monitor, mas mantém a execução básica." },
       { letra: "C", valor: 0.0, texto: "Recua, trava diante dos movimentos do cavalo ou é incapaz de realizar a equipagem do animal." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a instrução." },
     ],
@@ -33,7 +33,7 @@ export const CENARIOS_CFGS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Executa a ginástica e as transições de andadura com segurança, sem buscar apoio na sela ou crinas." },
-      { letra: "B", valor: 1.4, texto: "Hesita em algum exercício ou busca apoio reativo, mas recupera a postura após orientação." },
+      { letra: "B", valor: 0.8, texto: "Hesita em algum exercício ou busca apoio reativo, mas recupera a postura após orientação." },
       { letra: "C", valor: 0.0, texto: "Recusa ou interrompe exercícios por medo, ou perde o controle postural nas transições de andadura." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a instrução." },
     ],
@@ -49,7 +49,7 @@ export const CENARIOS_CFGS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Percebe quando o cavalo sai do alinhamento ou da atividade e aplica a correção com precisão e oportunidade." },
-      { letra: "B", valor: 1.4, texto: "Percebe o desalinhamento, mas a correção é lenta, incompleta ou depende de orientação verbal do instrutor." },
+      { letra: "B", valor: 0.8, texto: "Percebe o desalinhamento, mas a correção é lenta, incompleta ou depende de orientação verbal do instrutor." },
       { letra: "C", valor: 0.0, texto: "Não percebe ou ignora o desalinhamento do cavalo, deixando o animal executar incorretamente sem intervir." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a instrução." },
     ],
@@ -65,7 +65,7 @@ export const CENARIOS_CFGS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Sustenta o esforço físico mantendo postura e concentração corretas até o encerramento da instrução." },
-      { letra: "B", valor: 1.4, texto: "Demonstra sinais de cansaço e desalinha temporariamente, mas mantém o esforço voluntário." },
+      { letra: "B", valor: 0.8, texto: "Demonstra sinais de cansaço e desalinha temporariamente, mas mantém o esforço voluntário." },
       { letra: "C", valor: 0.0, texto: "Abandona o exercício antes do tempo ou desaba sobre o lombo do cavalo por fadiga." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a instrução." },
     ],
@@ -81,7 +81,7 @@ export const CENARIOS_CFGS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Demonstra liderança clara — aplica comandos precisos, mantém o controle e conduz o cavalo com intencionalidade." },
-      { letra: "B", valor: 1.4, texto: "Alterna momentos de comando e passividade — comanda quando orientado, mas sem iniciativa constante." },
+      { letra: "B", valor: 0.8, texto: "Alterna momentos de comando e passividade — comanda quando orientado, mas sem iniciativa constante." },
       { letra: "C", valor: 0.0, texto: "Está apenas sobrevivendo na sela — não aplica comandos e o cavalo age por conta própria sem interferência." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a instrução." },
     ],
@@ -101,7 +101,7 @@ export const CENARIOS_ATLETAS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Apresenta-se impecável e está no local antes do horário previsto, sem necessidade de convocação." },
-      { letra: "B", valor: 1.4, texto: "Apresenta-se adequadamente e cumpre os horários, mas sem antecipar ou se destacar." },
+      { letra: "B", valor: 0.8, texto: "Apresenta-se adequadamente e cumpre os horários, mas sem antecipar ou se destacar." },
       { letra: "C", valor: 0.0, texto: "Apresenta irregularidades na farda ou descumpre horários, necessitando de cobrança." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a atividade." },
     ],
@@ -117,7 +117,7 @@ export const CENARIOS_ATLETAS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Organiza e cuida do material e do cavalo com zelo, antecipando necessidades sem ser solicitado." },
-      { letra: "B", valor: 1.4, texto: "Cuida do material e do cavalo adequadamente quando solicitado, sem maiores problemas." },
+      { letra: "B", valor: 0.8, texto: "Cuida do material e do cavalo adequadamente quando solicitado, sem maiores problemas." },
       { letra: "C", valor: 0.0, texto: "Demonstra descuido com o material ou o cavalo, causando problemas ou necessitando supervisão constante." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a atividade." },
     ],
@@ -133,7 +133,7 @@ export const CENARIOS_ATLETAS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Mantém conduta exemplar — representa a ESA com distinção, integra o grupo e demonstra autocontrole em qualquer ambiente." },
-      { letra: "B", valor: 1.4, texto: "Mantém conduta adequada, sem transgressões, integra o grupo sem destaque positivo ou negativo." },
+      { letra: "B", valor: 0.8, texto: "Mantém conduta adequada, sem transgressões, integra o grupo sem destaque positivo ou negativo." },
       { letra: "C", valor: 0.0, texto: "Apresenta conduta inadequada ao ambiente militar ou compromete a imagem da equipe e da ESA." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a atividade." },
     ],
@@ -149,7 +149,7 @@ export const CENARIOS_ATLETAS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Age com postura, cordialidade e respeito em todas as interações, destacando-se como representante da ESA." },
-      { letra: "B", valor: 1.4, texto: "Mantém postura adequada e respeito nas interações, sem condutas inadequadas." },
+      { letra: "B", valor: 0.8, texto: "Mantém postura adequada e respeito nas interações, sem condutas inadequadas." },
       { letra: "C", valor: 0.0, texto: "Demonstra postura inadequada, desrespeito ou comportamento incompatível com a representação institucional." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a atividade." },
     ],
@@ -165,7 +165,7 @@ export const CENARIOS_ATLETAS = [
     },
     opcoes: [
       { letra: "A", valor: 1.6, texto: "Mantém a serenidade diante de adversidades, toma decisões rápidas e ajusta a estratégia com autonomia." },
-      { letra: "B", valor: 1.4, texto: "Lida com a adversidade sem perder o controle, mas aguarda orientação antes de agir." },
+      { letra: "B", valor: 0.8, texto: "Lida com a adversidade sem perder o controle, mas aguarda orientação antes de agir." },
       { letra: "C", valor: 0.0, texto: "Demonstra instabilidade emocional, omissão ou reações inadequadas diante de pressão ou resultados negativos." },
       { letra: "NO", valor: null, texto: "Não Observado — situação não ocorreu durante a atividade." },
     ],
