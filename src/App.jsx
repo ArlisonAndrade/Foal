@@ -191,6 +191,7 @@ export default function App() {
     </div>
   );
 
+  // forçar deploy
   // ── PIN ───────────────────────────────────────────────────
   if (s.tela === "pin") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
