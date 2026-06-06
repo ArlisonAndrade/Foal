@@ -480,14 +480,13 @@ export default function App() {
             </div>
           );
         })}
-      </Wrap>
-      {todosConcluidos && (
-        <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
-          <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
-            Enviar Avaliações →
-          </Btn>
-        </div>
-      )}
+</Wrap>
+      {/* CORREÇÃO: O botão agora fica sempre visível e avisa se houver pendências */}
+      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
+        <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
+          {todosConcluidos ? "✓ Enviar Avaliações →" : "Enviar Avaliações (Incompletas) →"}
+        </Btn>
+      </div>
       <Footer />
     </div>
   );
