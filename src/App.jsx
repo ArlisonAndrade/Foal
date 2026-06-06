@@ -899,7 +899,7 @@ export default function App() {
               };
             });
             try {
-              const resp = await fetch("/api/salvar", {
+              const resp = await fetch("https://foal-app.vercel.app/api/salvar", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ registros }),
               });
