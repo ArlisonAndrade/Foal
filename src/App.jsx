@@ -847,7 +847,7 @@ export default function App() {
             borderRadius: "14px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
             <div style={{ fontSize: "36px", marginBottom: "10px" }}>⚠️</div>
             <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "17px",
-              fontWeight: "700", color: C.verde, marginBottom: "8px" }}>Atenção</div>
+              fontWeight: "700", color: C.verde, marginBottom: "8px" }}>Atenção Teste Conexão</div>
             <div style={{ fontSize: "13px", color: "#7a6a3a", lineHeight: "1.7" }}>
               Ao confirmar, as avaliações serão registradas<br />
               e <strong style={{ color: C.verde }}>não poderão mais ser editadas</strong> por este aplicativo.
