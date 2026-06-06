@@ -878,39 +878,62 @@ export default function App() {
           )}
 
           <Btn cor="#27ae60" disabled={s.enviando} onClick={async () => {
-            set({ enviando: true, erroEnvio: null });
-            const alunosLista = s.modo === "ATLETAS" ? ATLETAS : (
-              s.grupamentoSel && s.grupamentos ? s.grupamentos[s.grupamentoSel] : Object.keys(s.alunos)
-            );
-            const registros = alunosLista.map(nome => {
-              const dados = s.alunos[nome] || alunoVazio();
-              const fatos = Object.entries(dados.fos || {})
-                .filter(([,v]) => v && v !== "nenhum")
-                .map(([attr, tipo]) => `[${attr.replace("_"," ")}] ${tipo} — ${dados.fosDesc?.[attr] || "sem descrição"}`);
-              return {
-                aluno: nome, instrutor: s.instrutor || "Não informado",
-                curso: s.modo === "ATLETAS" ? "EQUIPE DE SALTO" : s.curso,
-                turma: s.modo === "ATLETAS" ? "Viagem de Competição" : s.turma,
-                tipo: s.modo,
-                status: dados.status,
-                data: new Date().toISOString().split("T")[0],
-                resultados: dados.resultados || {},
-                fatos, observacoes: dados.observacoes || "",
-              };
-            });
             try {
+              set({ enviando: true, erroEnvio: null });
+              
+              // Garante uma lista de nomes válida para não quebrar o código
+              let alunosLista = [];
+              if (s.modo === "ATLETAS") {
+                alunosLista = typeof ATLETAS !== 'undefined' ? ATLETAS : [];
+              } else {
+                alunosLista = s.grupamentoSel && s.grupamentos ? (s.grupamentos[s.grupamentoSel] || []) : Object.keys(s.alunos || {});
+              }
+
+              if (alunosLista.length === 0) {
+                throw new Error("Nenhum aluno ou atleta encontrado para envio.");
+              }
+
+              const registros = alunosLista.map(nome => {
+                const dados = (s.alunos && s.alunos[nome]) || { status: "Não Realizou", resultados: {}, observacoes: "" };
+                const fatos = Object.entries(dados.fos || {})
+                  .filter(([,v]) => v && v !== "nenhum")
+                  .map(([attr, tipo]) => `[${attr.replace("_"," ")}] ${tipo} — ${dados.fosDesc?.[attr] || "sem descrição"}`);
+                
+                return {
+                  aluno: nome, 
+                  instrutor: s.instrutor || "Não informado",
+                  curso: s.modo === "ATLETAS" ? "EQUIPE DE SALTO" : (s.curso || "CFGS"),
+                  turma: s.modo === "ATLETAS" ? "Viagem de Competição" : (s.turma || "Geral"),
+                  tipo: s.modo || "ALUNOS",
+                  status: dados.status || "Não Realizou",
+                  data: new Date().toISOString().split("T")[0],
+                  fatos, 
+                  observacoes: dados.observacoes || "",
+                  resultados: dados.resultados || {},
+                };
+              });
+
+              // Dispara para a URL correta na Vercel
               const resp = await fetch("https://foal-app.vercel.app/api/salvar", {
-                method: "POST", headers: { "Content-Type": "application/json" },
+                method: "POST", 
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ registros }),
               });
-              if (!resp.ok) throw new Error("Falha na conexão");
+              
+              if (!resp.ok) {
+                const dadosErro = await resp.json().catch(() => ({}));
+                throw new Error(dadosErro.error || "Falha na gravação do servidor");
+              }
+              
               const chave = s.modo === "ATLETAS" ? "ATLETAS_SALTO" : `${s.curso}_${s.turma}`;
               const novasEnviadas = { ...s.turmasEnviadas, [chave]: new Date().toISOString() };
               localStorage.setItem("foal_enviadas", JSON.stringify(novasEnviadas));
               set({ turmasEnviadas: novasEnviadas, enviando: false });
               ir("sucesso");
+
             } catch (e) {
-              set({ enviando: false, erroEnvio: "Falha ao enviar. Verifique a conexão e tente novamente." });
+              // Se qualquer linha acima falhar, o erro aparece direto na barra vermelha do app
+              set({ enviando: false, erroEnvio: `Erro interno: ${e.message}` });
             }
           }}>{s.enviando ? "Enviando..." : "✓ Confirmar e Enviar"}</Btn>
           <Btn outline cor={C.sub} onClick={() => ir(voltarTela)} style={{ marginBottom: 0 }}>Voltar e Revisar</Btn>
