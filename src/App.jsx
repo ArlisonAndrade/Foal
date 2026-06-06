@@ -878,20 +878,35 @@ export default function App() {
             try {
               set({ enviando: true, erroEnvio: null });
               
-              // Garante uma lista de nomes válida para não quebrar o código
-              let alunosLista = [];
-              if (s.modo === "ATLETAS") {
-                alunosLista = typeof ATLETAS !== 'undefined' ? ATLETAS : [];
-              } else {
-                alunosLista = s.grupamentoSel && s.grupamentos ? (s.grupamentos[s.grupamentoSel] || []) : Object.keys(s.alunos || {});
-              }
-
-              if (alunosLista.length === 0) {
-                throw new Error("Nenhum aluno ou atleta encontrado para envio.");
-              }
+              const alunosLista = s.modo === "ATLETAS" ? ATLETAS : (
+                s.grupamentoSel && s.grupamentos ? (s.grupamentos[s.grupamentoSel] || []) : Object.keys(s.alunos || {})
+              );
 
               const registros = alunosLista.map(nome => {
-                const dados = (s.alunos && s.alunos[nome]) || { status: "Não Realizou", resultados: {}, observacoes: "" };
+                const dados = s.alunos?.[nome] || { status: "Não Realizou", respostas: {}, fos: {}, fosDesc: {}, observacoes: "" };
+                
+                let notasCalculadas = {};
+                let statusReal = dados.status || "Não Realizou";
+
+                // Se o aluno foi avaliado, calcula a nota idêntico à tela de resultados
+                if (statusReal === "avaliado" && typeof calcularNota === "function") {
+                  let res = calcularNota(dados.respostas, cenarios, atributos);
+                  Object.entries(dados.fos || {}).forEach(([atribId, tipoFO]) => {
+                    if (tipoFO && tipoFO !== "nenhum" && typeof aplicarFO === "function") {
+                      res = aplicarFO(res, atribId, tipoFO);
+                    }
+                  });
+
+                  Object.entries(res).forEach(([atribId, r]) => {
+                    const nomeAtributo = atributos[atribId]?.nome || atribId;
+                    notasCalculadas[atribId] = {
+                      nome: nomeAtributo,
+                      nota: r.nota,
+                      mencao: r.mencao
+                    };
+                  });
+                }
+
                 const fatos = Object.entries(dados.fos || {})
                   .filter(([,v]) => v && v !== "nenhum")
                   .map(([attr, tipo]) => `[${attr.replace("_"," ")}] ${tipo} — ${dados.fosDesc?.[attr] || "sem descrição"}`);
@@ -902,15 +917,15 @@ export default function App() {
                   curso: s.modo === "ATLETAS" ? "EQUIPE DE SALTO" : (s.curso || "CFGS"),
                   turma: s.modo === "ATLETAS" ? "Viagem de Competição" : (s.turma || "Geral"),
                   tipo: s.modo || "ALUNOS",
-                  status: dados.status || "Não Realizou",
+                  status: statusReal,
                   data: new Date().toISOString().split("T")[0],
                   fatos, 
                   observacoes: dados.observacoes || "",
-                  resultados: dados.resultados || {},
+                  resultados: notasCalculadas,
                 };
               });
 
-              // Dispara para a URL correta na Vercel
+              // Dispara via POST para o endereço de produção da Vercel
               const resp = await fetch("https://foal-app.vercel.app/api/salvar", {
                 method: "POST", 
                 headers: { "Content-Type": "application/json" },
@@ -929,11 +944,9 @@ export default function App() {
               ir("sucesso");
 
             } catch (e) {
-              // Se qualquer linha acima falhar, o erro aparece direto na barra vermelha do app
               set({ enviando: false, erroEnvio: `Erro interno: ${e.message}` });
             }
           }}>{s.enviando ? "Enviando..." : "✓ Confirmar e Enviar"}</Btn>
-          <Btn outline cor={C.sub} onClick={() => ir(voltarTela)} style={{ marginBottom: 0 }}>Voltar e Revisar</Btn>
         </Wrap>
         <Footer />
       </div>
