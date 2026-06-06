@@ -89,7 +89,7 @@ const Footer = () => (
 );
 
 const Wrap = ({ children, style }) => (
-  <div style={{ flex: 1, overflowY: "auto", padding: "18px 16px", ...style }}>{children}</div>
+  <div style={{ flex: 1, overflowY: "auto", padding: "32px 16px 24px", ...style }}>{children}</div>
 );
 
 const SecLabel = ({ children }) => (
@@ -624,8 +624,11 @@ export default function App() {
 
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", paddingBottom: todosConcluidos ? "80px" : "0" }}>
-        <Header titulo={s.grupamentoSel ? `Grupamento ${s.grupamentoSel}` : s.turma}
+        {/* CORREÇÃO: Removeu a palavra fixa para não duplicar com a variável do grupamento */}
+        <Header titulo={s.grupamentoSel ? s.grupamentoSel : s.turma}
           subtitulo={`${s.curso} · ${s.instrutor || ""}`} onVoltar={() => ir("turmas")} />
+        
+        {/* CORREÇÃO: Adicionado marginTop para dar o respiro visual e descolar do topo verde */}
         <Wrap>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "8px", marginBottom: "16px" }}>
             {[["#27ae60",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
@@ -654,15 +657,15 @@ export default function App() {
             );
           })}
         </Wrap>
-      {/* O botão agora fica visível de qualquer jeito para permitir o avanço */}
-      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
-        <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
-          Enviar Avaliações →
-        </Btn>
+        {/* O botão agora fica visível de qualquer jeito para permitir o avanço */}
+        <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
+          <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
+            Enviar Avaliações →
+          </Btn>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
-  );
+    );
   }
 
   // ── STATUS DO ALUNO ───────────────────────────────────────
