@@ -216,7 +216,8 @@ export default function App() {
               if (n === "⌫") { set({ pinDigitado: s.pinDigitado.slice(0,-1), pinErro: false }); return; }
               const novo = s.pinDigitado + n;
               if (novo.length === 4) {
-                if (novo === PIN_ADMIN) ir("instrutor", { perfil: "admin", pinDigitado: "" });
+                // CORREÇÃO: ADM vai direto pro painel sem pedir nome
+                if (novo === PIN_ADMIN) set({ instrutor: "Cap Arlison", perfil: "admin", pinDigitado: "", tela: "dashboard_adm" });
                 else set({ pinDigitado: "", pinErro: true });
               } else set({ pinDigitado: novo, pinErro: false });
             }} style={{
@@ -224,8 +225,7 @@ export default function App() {
               border: n ? `1.5px solid ${C.borda}` : "none",
               borderRadius: "14px", padding: "16px",
               fontSize: n === "⌫" ? "16px" : "22px", fontWeight: "600",
-              color: n === "⌫" ? C.ouro : C.texto,
-              cursor: n ? "pointer" : "default",
+              color: n === "⌫" ? C.ouro : C.texto, cursor: n ? "pointer" : "default",
               boxShadow: n ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
             }}>{n}</button>
           ))}
@@ -235,12 +235,10 @@ export default function App() {
     </div>
   );
 
-
-  // ── INSTRUTOR ─────────────────────────────────────────────
+  // ── INSTRUTOR (Apenas para Avaliador Comum) ──────────────
   if (s.tela === "instrutor") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      <Header titulo={s.perfil === "admin" ? "Administrador" : "Avaliador"}
-        subtitulo="Identificação" onVoltar={() => ir(s.perfil === "admin" ? "pin" : "home")} />
+      <Header titulo="Avaliador" subtitulo="Identificação" onVoltar={() => ir("home")} />
       <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "32px" }}>
         <div style={{ fontSize: "40px", marginBottom: "12px" }}>👤</div>
         <div style={{ fontSize: "16px", fontWeight: "600", color: C.verde, marginBottom: "4px" }}>
@@ -253,12 +251,7 @@ export default function App() {
           value={s.instrutor}
           onChange={e => set({ instrutor: e.target.value })}
           placeholder="Digite seu nome completo"
-          style={{
-            width: "100%", background: C.card, border: `1.5px solid ${C.borda}`,
-            borderRadius: "12px", padding: "14px 16px", fontSize: "16px",
-            color: C.texto, boxSizing: "border-box", marginBottom: "24px",
-            fontFamily: "Inter, sans-serif", outline: "none",
-          }}
+          style={{ width: "100%", background: C.card, border: `1.5px solid ${C.borda}`, borderRadius: "12px", padding: "14px 16px", fontSize: "16px", color: C.texto, boxSizing: "border-box", marginBottom: "24px", fontFamily: "Inter, sans-serif", outline: "none" }}
           autoFocus
         />
         <Btn disabled={!s.instrutor.trim()} onClick={() => ir("cursos")}>
@@ -269,17 +262,103 @@ export default function App() {
     </div>
   );
 
-  // ── CURSOS ────────────────────────────────────────────────
+  // ── DASHBOARD ADM ─────────────────────────────────────────
+  if (s.tela === "dashboard_adm") {
+    return (
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
+        <Header titulo="Painel de Controle" subtitulo="Administrador" onVoltar={() => set(appInicial())} />
+        <Wrap style={{ paddingTop: "24px" }}>
+          <div style={{ marginBottom: "24px", padding: "16px", background: C.card, borderRadius: "12px", borderLeft: `4px solid ${C.ouro}` }}>
+            <div style={{ fontSize: "14px", color: C.sub }}>Bem-vindo de volta,</div>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "20px", fontWeight: "900", color: C.texto }}>Olá, Cap Arlison!</div>
+          </div>
+          <div style={{ fontSize: "13px", color: C.sub, marginBottom: "12px", fontWeight: "600" }}>SELECIONE O CURSO / ARMA</div>
+          {Object.entries(CURSOS).map(([nome, dados]) => (
+            <Card key={nome} style={{ marginBottom: "10px", cursor: "pointer" }} onClick={() => set({ curso: nome, tela: "montar_grupamento", grupoAtual: "Grupamento A" })}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <img src={LOGOS[dados.logoKey]} style={{ width: "30px", height: "30px", objectFit: "contain" }} alt={nome} />
+                  <span style={{ fontWeight: "700", color: C.texto }}>{dados.nome || nome}</span>
+                </div>
+                <span style={{ fontSize: "12px", color: C.ouro }}>Montar Grupos →</span>
+              </div>
+            </Card>
+          ))}
+          <Btn outline cor={C.vermelho} onClick={() => set(appInicial())} style={{ marginTop: "32px" }}>Sair do Painel</Btn>
+        </Wrap>
+        <Footer />
+      </div>
+    );
+  }
+
+  // ── TELA DE MONTAGEM DE GRUPAMENTOS (ADM) ──────────────────
+  if (s.tela === "montar_grupamento") {
+    const todasTurmas = CURSOS[s.curso]?.turmas || {};
+    const todosAlunosDoCurso = Object.values(todasTurmas).flat().sort();
+    
+    const objGrupamentos = s.grupamentos || JSON.parse(localStorage.getItem("foal_grupamentos") || "{}");
+    const alunosJaAlocados = Object.entries(objGrupamentos[s.curso] || {})
+      .filter(([nomeGrupo]) => nomeGrupo !== s.grupoAtual)
+      .reduce((acc, [, lista]) => [...acc, ...lista], []);
+
+    const alunosDoGrupoAtual = objGrupamentos[s.curso]?.[s.grupoAtual] || [];
+
+    return (
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
+        <Header titulo={`Configurar ${s.curso}`} subtitulo={s.grupoAtual} onVoltar={() => ir("dashboard_adm")} />
+        <Wrap style={{ paddingTop: "16px" }}>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+            {["Grupamento A", "Grupamento B", "Grupamento C", "Grupamento D"].map(g => {
+              const ativo = s.grupoAtual === g;
+              return (
+                <button key={g} onClick={() => set({ grupoAtual: g })} style={{
+                  flex: 1, padding: "8px", borderRadius: "8px", fontSize: "11px", fontWeight: "700",
+                  background: ativo ? C.verde : C.card, color: ativo ? "#fff" : C.sub, border: "none"
+                }}>{g.replace("Grupamento ", "")}</button>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: "12px", color: C.sub, marginBottom: "12px" }}>Selecione os alunos do <strong>{s.grupoAtual}</strong>:</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "50vh", overflowY: "auto", marginBottom: "20px" }}>
+            {todosAlunosDoCurso.map(nome => {
+              if (alunosJaAlocados.includes(nome)) return null; 
+              const selecionado = alunosDoGrupoAtual.includes(nome);
+              return (
+                <div key={nome} onClick={() => {
+                  let novaLista = [...alunosDoGrupoAtual];
+                  if (selecionado) novaLista = novaLista.filter(n => n !== nome);
+                  else novaLista.push(nome);
+                  
+                  const novos = { ...objGrupamentos, [s.curso]: { ...objGrupamentos[s.curso], [s.grupoAtual]: novaLista } };
+                  localStorage.setItem("foal_grupamentos", JSON.stringify(novos));
+                  set({ grupamentos: novos });
+                }} style={{
+                  padding: "12px", background: selecionado ? "rgba(39,174,96,.1)" : C.card,
+                  border: `1px solid ${selecionado ? C.verde : C.borda}`, borderRadius: "10px",
+                  display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer"
+                }}>
+                  <span style={{ fontSize: "13px", color: C.texto, fontWeight: selecionado ? "700" : "500" }}>{nome}</span>
+                  <span style={{ color: selecionado ? C.verde : C.sub }}>{selecionado ? "●" : "○"}</span>
+                </div>
+              );
+            })}
+          </div>
+          <Btn cor={C.verde} onClick={() => ir("dashboard_adm")}>✓ Salvar Alterações</Btn>
+        </Wrap>
+      </div>
+    );
+  }
+
+  // ── CURSOS (Para o Avaliador Comum) ──────────────────────
   if (s.tela === "cursos") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      <Header titulo="Selecione" subtitulo={`Perfil: ${s.perfil === "admin" ? "Administrador" : "Avaliador"}`} onVoltar={() => ir("home")} />
+      <Header titulo="Selecione" subtitulo="Perfil: Avaliador" onVoltar={() => set(appInicial())} />
       <Wrap>
         {/* ATLETAS */}
         <SecLabel>Equipe de Salto</SecLabel>
         <div onClick={() => ir("atletas_lista", { modo: "ATLETAS", alunos: Object.fromEntries(ATLETAS.map(n => [n, s.alunos[n] || alunoVazio()])) })}
           style={{ background: C.card, borderRadius: "14px", padding: "15px 16px", border: `1.5px solid ${C.borda}`,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: "20px",
-            display: "flex", alignItems: "center", gap: "14px", cursor: "pointer" }}>
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)", marginBottom: "20px", display: "flex", alignItems: "center", gap: "14px", cursor: "pointer" }}>
           <img src={LOGOS.atletas} style={{ width: "44px", height: "44px", objectFit: "contain" }} alt="atletas" />
           <div>
             <div style={{ fontSize: "15px", fontWeight: "600", color: C.texto }}>ATLETAS</div>
@@ -293,18 +372,26 @@ export default function App() {
         {Object.entries(CURSOS).map(([nome, dados]) => {
           const ativo = dados.ativo && Object.keys(dados.turmas).length > 0;
           return (
-            <div key={nome} onClick={() => ativo && ir("turmas", { curso: nome, modo: "CFGS" })}
-              style={{ background: C.card, borderRadius: "14px", padding: "15px 16px",
-                border: `1.5px solid ${ativo ? C.borda : "#f0ede8"}`,
-                boxShadow: ativo ? "0 2px 8px rgba(0,0,0,0.06)" : "none",
-                marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px",
+            <div key={nome} onClick={() => {
+              if (!ativo) return;
+              const objGrupamentos = s.grupamentos || JSON.parse(localStorage.getItem("foal_grupamentos") || "{}");
+              const gruposDesseCurso = objGrupamentos[nome] || {};
+              const temGruposValidos = Object.values(gruposDesseCurso).some(lista => lista.length > 0);
+
+              if (temGruposValidos) {
+                ir("escolher_grupamento", { curso: nome, modo: "CFGS" });
+              } else {
+                alert(`Nenhum grupamento montado para a ${nome}.\nO sistema carregará as turmas completas.`);
+                ir("turmas", { curso: nome, modo: "CFGS" });
+              }
+            }}
+              style={{ background: C.card, borderRadius: "14px", padding: "15px 16px", border: `1.5px solid ${ativo ? C.borda : "#f0ede8"}`,
+                boxShadow: ativo ? "0 2px 8px rgba(0,0,0,0.06)" : "none", marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px",
                 cursor: ativo ? "pointer" : "not-allowed", opacity: ativo ? 1 : 0.38 }}>
               <img src={LOGOS[dados.logoKey]} style={{ width: "44px", height: "44px", objectFit: "contain" }} alt={nome} />
               <div>
                 <div style={{ fontSize: "15px", fontWeight: "600", color: C.texto }}>{dados.nome || nome}</div>
-                <div style={{ fontSize: "11px", color: C.sub }}>
-                  {ativo ? `${Object.keys(dados.turmas).length} turma(s)` : "Sem turmas cadastradas"}
-                </div>
+                <div style={{ fontSize: "11px", color: C.sub }}>{ativo ? "Acessar Avaliação" : "Indisponível"}</div>
               </div>
               {ativo && <div style={{ marginLeft: "auto", color: C.ouro, fontSize: "20px" }}>›</div>}
             </div>
@@ -314,6 +401,43 @@ export default function App() {
       <Footer />
     </div>
   );
+
+  // ── ESCOLHER GRUPAMENTO (Se existirem grupos criados) ────
+  if (s.tela === "escolher_grupamento") {
+    const objGrupamentos = s.grupamentos || JSON.parse(localStorage.getItem("foal_grupamentos") || "{}");
+    const gruposDesseCurso = objGrupamentos[s.curso] || {};
+    
+    return (
+      <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
+        <Header titulo="Selecione o Grupo" subtitulo={s.curso} onVoltar={() => ir("cursos")} />
+        <Wrap style={{ paddingTop: "24px" }}>
+          <div style={{ fontSize: "13px", color: C.sub, marginBottom: "16px" }}>Grupos montados pelo Administrador:</div>
+          {Object.entries(gruposDesseCurso).map(([nomeGrupo, listaAlunos]) => {
+            if (!listaAlunos || listaAlunos.length === 0) return null;
+            return (
+              <Card key={nomeGrupo} style={{ marginBottom: "10px", cursor: "pointer" }} onClick={() => {
+                // Ao clicar, converte a lista de nomes do grupo no formato que a tela de alunos entende
+                const alunosPreparados = Object.fromEntries(listaAlunos.map(n => [n, s.alunos[n] || alunoVazio()]));
+                ir("alunos", { grupamentoSel: nomeGrupo, alunos: alunosPreparados });
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontWeight: "700", color: C.texto }}>{nomeGrupo}</div>
+                    <div style={{ fontSize: "11px", color: C.sub }}>{listaAlunos.length} aluno(s)</div>
+                  </div>
+                  <div style={{ color: C.ouro, fontSize: "20px" }}>›</div>
+                </div>
+              </Card>
+            );
+          })}
+          <Btn outline cor={C.sub} onClick={() => ir("turmas", { modo: "CFGS" })} style={{ marginTop: "24px" }}>
+            Ignorar grupos e ver Turmas Completas
+          </Btn>
+        </Wrap>
+        <Footer />
+      </div>
+    );
+  }
 
   // ── TURMAS ────────────────────────────────────────────────
   if (s.tela === "turmas") return (
