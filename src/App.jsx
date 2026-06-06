@@ -480,11 +480,11 @@ export default function App() {
             </div>
           );
         })}
-</Wrap>
-      {/* CORREÇÃO: O botão agora fica sempre visível e avisa se houver pendências */}
+     </Wrap>
+      {/* O botão agora fica visível de qualquer jeito para permitir o avanço */}
       <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
         <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
-          {todosConcluidos ? "✓ Enviar Avaliações →" : "Enviar Avaliações (Incompletas) →"}
+          Enviar Avaliações →
         </Btn>
       </div>
       <Footer />
@@ -529,17 +529,15 @@ export default function App() {
             );
           })}
         </Wrap>
-        {todosConcluidos && (
-          <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: C.bg,
-            borderTop: `1px solid ${C.borda}`, padding: "12px 16px" }}>
-            <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
-              Enviar Avaliações →
-            </Btn>
-          </div>
-        )}
-        <Footer />
+      {/* O botão agora fica visível de qualquer jeito para permitir o avanço */}
+      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
+        <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
+          Enviar Avaliações →
+        </Btn>
       </div>
-    );
+      <Footer />
+    </div>
+  );
   }
 
   // ── STATUS DO ALUNO ───────────────────────────────────────
