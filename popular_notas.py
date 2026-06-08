@@ -16,7 +16,7 @@ import time
 
 # ── CONFIGURAÇÃO ──────────────────────────────────────────────
 NOTION_API_KEY    = "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"
-DATABASE_ID       = "364a5d5481f180b883eecca3ef89bc76"
+DATABASE_ID       = "364a5d54-81f1-80b8-83ee-cca3ef89bc76"
 HEADERS = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
     "Content-Type": "application/json",
