@@ -15,42 +15,66 @@ import {
 const PIN_ADMIN = "2311";
 
 const C = {
-  bg:      "#f4f1eb",
-  card:    "#ffffff",
-  verde:   "#1c3a1c",
-  ouro:    "#c9a84c",
-  texto:   "#1a1a1a",
-  sub:     "#9a9a8a",
-  borda:   "#ece9e2",
-  vermelho:"#c0392b",
-  azul:    "#2980b9",
-  laranja: "#e67e22",
+  bg:       "#eceae2",  // papel ósseo frio
+  card:     "#ffffff",
+  field:    "#f6f5ef",
+  verde:    "#142a1e",  // verde profundo (header)
+  verde2:   "#1b3a2a",  // verde primário (botões)
+  ouro:     "#c2a24f",  // latão
+  ouroSoft: "#9a7420",
+  texto:    "#16180f",
+  sub:      "#7d8174",
+  borda:    "#dcdbd1",
+  vermelho: "#c0392b",
+  azul:     "#2477a8",
+  laranja:  "#d97b1f",
+  verdeOk:  "#1e8449",
+};
+
+// ─── ÍCONES (linha, sem emoji) ──────────────────────────
+const Ico = ({ name, size = 18, color = "currentColor", w = 1.8 }) => {
+  const p = {
+    lock:      <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>,
+    clipboard: <><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 3h6v4H9z" /><path d="M9 11h6M9 15h4" /></>,
+    user:      <><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 4-6 8-6s8 2 8 6" /></>,
+    check:     <path d="M5 12l4 4L19 6" />,
+    x:         <path d="M6 6l12 12M18 6L6 18" />,
+    chevron:   <path d="M9 6l6 6-6 6" />,
+    back:      <path d="M9 6l-6 6 6 6" />,
+    info:      <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h0" /></>,
+    alert:     <><path d="M12 9v4M12 17h0" /><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" /></>,
+    arrow:     <path d="M5 12h14M13 6l6 6-6 6" />,
+  };
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+      strokeWidth={w} strokeLinecap="round" strokeLinejoin="round">{p[name]}</svg>
+  );
 };
 
 // ─── COMPONENTES BASE ─────────────────────────────────────────
-const Btn = ({ children, onClick, cor = C.verde, outline, disabled, style = {} }) => (
+const Btn = ({ children, onClick, cor = C.verde2, outline, disabled, style = {} }) => (
   <button onClick={onClick} disabled={disabled} style={{
-    width: "100%", border: outline ? `2px solid ${cor}` : "none",
-    background: outline ? "transparent" : disabled ? "#ccc" : cor,
+    width: "100%", border: outline ? `1.5px solid ${cor}` : "none",
+    background: outline ? "transparent" : disabled ? "#cfcdc4" : cor,
     color: outline ? cor : "#fff",
-    borderRadius: "14px", padding: "16px",
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontSize: "17px", fontWeight: "700", letterSpacing: "1.5px",
+    borderRadius: "10px", padding: "15px",
+    fontFamily: "'Inter', sans-serif",
+    fontSize: "13px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase",
     cursor: disabled ? "not-allowed" : "pointer",
     marginBottom: "12px", display: "flex",
-    alignItems: "center", justifyContent: "center", gap: "10px",
-    boxShadow: outline || disabled ? "none" : `0 3px 12px ${cor}44`,
-    opacity: disabled ? 0.6 : 1,
+    alignItems: "center", justifyContent: "center", gap: "9px",
+    boxShadow: "none",
+    opacity: disabled ? 0.55 : 1,
     ...style,
   }}>{children}</button>
 );
 
 const Card = ({ children, style, bordaEsq, onClick }) => (
   <div onClick={onClick} style={{
-    background: C.card, borderRadius: "14px", padding: "15px 16px",
-    border: `1.5px solid ${C.borda}`,
-    borderLeft: bordaEsq ? `4px solid ${bordaEsq}` : undefined,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+    background: C.card, borderRadius: "10px", padding: "15px 16px",
+    border: `1px solid ${C.borda}`,
+    borderLeft: bordaEsq ? `3px solid ${bordaEsq}` : undefined,
+    boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
     marginBottom: "10px",
     cursor: onClick ? "pointer" : undefined,
     ...style,
@@ -59,24 +83,25 @@ const Card = ({ children, style, bordaEsq, onClick }) => (
 
 const Header = ({ titulo, subtitulo, onVoltar, tipo = "CFGS" }) => (
   <div style={{ background: C.verde, flexShrink: 0 }}>
-    <div style={{ background: `linear-gradient(90deg,${C.ouro}99,${C.ouro},${C.ouro}99)`, height: "3px" }} />
-    <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "11px", padding: "14px 16px 16px" }}>
       {onVoltar && (
         <button onClick={onVoltar} style={{
-          background: "rgba(255,255,255,0.15)", border: "none", color: C.ouro,
-          borderRadius: "8px", padding: "5px 10px", cursor: "pointer", fontSize: "18px",
-        }}>‹</button>
+          background: "rgba(255,255,255,0.1)", border: "none", color: C.ouro,
+          borderRadius: "8px", width: "32px", height: "32px", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+        }}><Ico name="back" size={17} w={1.9} /></button>
       )}
       <img src={tipo === "ATLETAS" ? LOGOS.atletas : LOGOS.secequi}
-        style={{ width: "34px", height: "34px", objectFit: "contain" }} alt="logo" />
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: "9px", letterSpacing: "2px", color: C.ouro, textTransform: "uppercase" }}>
+        style={{ width: "32px", height: "32px", objectFit: "contain" }} alt="logo" />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: "9.5px", letterSpacing: "0.2em", color: C.ouro, textTransform: "uppercase", fontWeight: "600" }}>
           {tipo === "ATLETAS" ? "Equipe de Salto · ESA" : "Seção de Equitação · ESA"}
         </div>
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "16px", fontWeight: "900", color: "#fff" }}>
+        <div style={{ fontSize: "17px", fontWeight: "700", color: "#fff", letterSpacing: "0.01em",
+          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {titulo}
         </div>
-        {subtitulo && <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.55)", marginTop: "1px" }}>{subtitulo}</div>}
+        {subtitulo && <div style={{ fontSize: "10.5px", color: "rgba(255,255,255,0.5)", marginTop: "2px" }}>{subtitulo}</div>}
       </div>
     </div>
   </div>
@@ -104,14 +129,14 @@ const SecLabel = ({ children }) => (
 // ─── CHIP STATUS ─────────────────────────────────────────────
 const Chip = ({ status }) => {
   const map = {
-    avaliado:     { bg: "rgba(39,174,96,.12)",  color: "#1e8449", label: "✓ Avaliado" },
-    andamento:    { bg: "rgba(243,156,18,.12)", color: "#b7770d", label: "⏳ Andamento" },
-    nao_realizou: { bg: "rgba(192,57,43,.10)",  color: "#922b21", label: "✗ Não realizou" },
+    avaliado:     { bg: "rgba(30,132,73,.12)",  color: "#1e8449", label: "Avaliado" },
+    andamento:    { bg: "rgba(194,162,79,.16)", color: "#9a7420", label: "Andamento" },
+    nao_realizou: { bg: "rgba(192,57,43,.10)",  color: "#922b21", label: "Não realizou" },
     pendente:     { bg: "transparent",          color: C.sub,     label: "Avaliar →" },
   };
   const s = map[status] || map.pendente;
   return (
-    <span style={{ background: s.bg, color: s.color, padding: "3px 9px",
+    <span style={{ background: s.bg, color: s.color, padding: "4px 10px",
       borderRadius: "20px", fontSize: "10px", fontWeight: "600" }}>{s.label}</span>
   );
 };
@@ -152,7 +177,7 @@ export default function App() {
   const { user } = useAuth();
 
   if (user === undefined) return (
-    <div style={{ minHeight: "100vh", background: "#f4f1eb", display: "flex",
+    <div style={{ minHeight: "100vh", background: "#eceae2", display: "flex",
       alignItems: "center", justifyContent: "center", color: "#9a9a8a", fontSize: "14px" }}>
       Carregando...
     </div>
@@ -169,7 +194,7 @@ function AppAutenticado() {
   const set = (updates) => setS(prev => ({ ...prev, ...updates }));
   const ir = (tela, extra = {}) => set({ tela, ...extra });
 
-  // Após login via tela de avaliador, decide próximo passo
+  // Após login via tela do avaliador, decide próximo passo
   useEffect(() => {
     if (user && s.tela === "aguardando_login") {
       const instrutorSalvo = localStorage.getItem("foal_instrutor");
@@ -212,7 +237,7 @@ function AppAutenticado() {
         <div style={{ width: "56px", height: "2px", background: `linear-gradient(90deg,${C.ouro},${C.verde})`,
           borderRadius: "2px", margin: "20px 0 32px" }} />
         <div style={{ width: "100%" }}>
-          <Btn onClick={() => ir("pin")}>🔐&nbsp; ADMINISTRADOR</Btn>
+          <Btn onClick={() => ir("pin")}><Ico name="lock" size={17} />ADMINISTRADOR</Btn>
           <Btn outline cor={C.verde} onClick={() => {
             if (!user) { ir("aguardando_login"); return; }
             const instrutorSalvo = localStorage.getItem("foal_instrutor");
@@ -222,7 +247,7 @@ function AppAutenticado() {
               ir("instrutor", { perfil: "avaliador" });
             }
           }} style={{ marginBottom: 0 }}>
-            📋&nbsp; AVALIADOR
+            <Ico name="clipboard" size={17} />AVALIADOR
           </Btn>
         </div>
         {user && (
@@ -252,7 +277,8 @@ function AppAutenticado() {
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <Header titulo="Administrador" subtitulo="Acesso restrito" onVoltar={() => ir("home")} />
       <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "32px" }}>
-        <div style={{ fontSize: "40px", marginBottom: "12px" }}>🔐</div>
+        <div style={{ width: "54px", height: "54px", borderRadius: "13px", background: C.verde, color: C.ouro,
+          display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}><Ico name="lock" size={26} w={1.7} /></div>
         <div style={{ fontSize: "16px", fontWeight: "600", color: C.verde, marginBottom: "4px" }}>Digite o PIN</div>
         <div style={{ fontSize: "12px", color: C.sub, marginBottom: "24px" }}>Acesso exclusivo do administrador</div>
         <div style={{ display: "flex", gap: "14px", marginBottom: "28px" }}>
@@ -296,7 +322,8 @@ function AppAutenticado() {
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <Header titulo="Avaliador" subtitulo="Identificação" onVoltar={() => ir("home")} />
       <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "32px" }}>
-        <div style={{ fontSize: "40px", marginBottom: "12px" }}>👤</div>
+        <div style={{ width: "54px", height: "54px", borderRadius: "13px", background: "rgba(194,162,79,0.15)", color: C.ouro,
+          display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}><Ico name="user" size={26} w={1.7} /></div>
         <div style={{ fontSize: "16px", fontWeight: "600", color: C.verde, marginBottom: "4px" }}>
           Qual é o seu nome?
         </div>
@@ -402,7 +429,7 @@ function AppAutenticado() {
               );
             })}
           </div>
-          <Btn cor={C.verde} onClick={() => ir("dashboard_adm")}>✓ Salvar Alterações</Btn>
+          <Btn cor={C.verde2} onClick={() => ir("dashboard_adm")}>Salvar Alterações</Btn>
         </Wrap>
       </div>
     );
@@ -526,11 +553,11 @@ function AppAutenticado() {
                 <div>
                   <div style={{ fontSize: "15px", fontWeight: "600", color: C.texto }}>{nomeTurma}</div>
                   <div style={{ fontSize: "11px", color: C.sub }}>{alns.length} alunos
-                    {enviada && <span style={{ color: "#27ae60", marginLeft: "8px" }}>· ✓ Enviada</span>}
+                    {enviada && <span style={{ color: C.verdeOk, marginLeft: "8px" }}>· Enviada</span>}
                   </div>
                 </div>
-                <div style={{ marginLeft: "auto", color: enviada ? "#27ae60" : C.ouro, fontSize: "20px" }}>
-                  {enviada ? "✓" : "›"}
+                <div style={{ marginLeft: "auto", color: enviada ? C.verdeOk : C.ouro, display: "flex", alignItems: "center" }}>
+                  {enviada ? <Ico name="check" size={18} w={2.2} /> : <Ico name="chevron" size={18} />}
                 </div>
               </div>
             </Card>
@@ -572,7 +599,7 @@ function AppAutenticado() {
               <SecLabel>Prévia dos grupamentos</SecLabel>
               {letras.map((l, i) => {
                 const grpAlns = alnsTotal.slice(i * tamanho, (i+1) * tamanho);
-                const cores = ["#1c3a1c","#c9a84c","#8B4513","#1A3A5C"];
+                const cores = ["#1c3a1c","#9a7420","#8B4513","#1A3A5C"];
                 return (
                   <Card key={l} style={{ marginBottom: "10px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -592,18 +619,18 @@ function AppAutenticado() {
                   const alunosInicial = {};
                   Object.values(grps).flat().forEach(n => { alunosInicial[n] = alunoVazio(); });
                   ir("alunos", { grupamentos: grps, alunos: alunosInicial });
-                }}>🔒 Confirmar e Iniciar</Btn>
+                }}>Confirmar e Iniciar</Btn>
               </div>
             </>
           ) : (
             <>
               <SecLabel>Selecione seu grupamento</SecLabel>
-              <div style={{ background: "rgba(201,168,76,.1)", border: `1px solid ${C.ouro}44`,
-                borderRadius: "12px", padding: "14px", marginBottom: "16px", fontSize: "12px", color: "#7a6a3a" }}>
-                ℹ️ Os grupamentos são criados pelo administrador. Selecione o seu.
+              <div style={{ background: "rgba(194,162,79,.1)", border: `1px solid ${C.ouro}44`,
+                borderRadius: "12px", padding: "14px", marginBottom: "16px", fontSize: "12px", color: "#9a7420" }}>
+                Os grupamentos são criados pelo administrador. Selecione o seu.
               </div>
               {letras.map((l, i) => {
-                const cores = ["#1c3a1c","#c9a84c","#8B4513","#1A3A5C"];
+                const cores = ["#1c3a1c","#9a7420","#8B4513","#1A3A5C"];
                 const grpAlns = alnsTotal.slice(i * tamanho, (i+1) * tamanho);
                 return (
                   <Card key={l} style={{ cursor: "pointer" }} onClick={() => {
@@ -638,7 +665,7 @@ function AppAutenticado() {
       <Header titulo="Equipe de Salto" subtitulo="Viagem de Competição" onVoltar={() => ir("cursos")} tipo="ATLETAS" />
       <Wrap>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "8px", marginBottom: "16px" }}>
-          {[["#27ae60",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
+          {[["#1e8449",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
             <div key={l} style={{ background: C.card, borderRadius: "10px", padding: "10px 6px",
               textAlign: "center", border: `1.5px solid ${C.borda}` }}>
               <div style={{ fontSize: "20px", fontWeight: "700", color: cor }}>{n}</div>
@@ -651,9 +678,9 @@ function AppAutenticado() {
           return (
             <div key={nome} onClick={() => ir("status_aluno", { alunoAtual: nome, cenarioIdx: 0 })}
               style={{ background: dados.status === "avaliado" ? "rgba(39,174,96,.06)"
-                : dados.status === "andamento" ? "rgba(243,156,18,.06)"
+                : dados.status === "andamento" ? "rgba(194,162,79,.06)"
                 : dados.status === "nao_realizou" ? "rgba(192,57,43,.06)" : C.card,
-                border: `1.5px solid ${dados.status === "avaliado" ? "#27ae60"
+                border: `1.5px solid ${dados.status === "avaliado" ? "#1e8449"
                   : dados.status === "andamento" ? C.ouro
                   : dados.status === "nao_realizou" ? C.vermelho : C.borda}`,
                 borderRadius: "12px", padding: "13px 15px", marginBottom: "8px",
@@ -666,7 +693,7 @@ function AppAutenticado() {
      </Wrap>
       {/* O botão agora fica visível de qualquer jeito para permitir o avanço */}
       <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
-        <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
+        <Btn cor="#1e8449" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
           Enviar Avaliações →
         </Btn>
       </div>
@@ -685,10 +712,9 @@ function AppAutenticado() {
         <Header titulo={s.grupamentoSel ? s.grupamentoSel : s.turma}
           subtitulo={`${s.curso} · ${s.instrutor || ""}`}
           onVoltar={() => s.grupamentoSel ? ir("escolher_grupamento") : ir("turmas")} />
-        
         <Wrap>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "8px", marginBottom: "16px" }}>
-            {[["#27ae60",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
+            {[["#1e8449",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
               <div key={l} style={{ background: C.card, borderRadius: "10px", padding: "10px 6px",
                 textAlign: "center", border: `1.5px solid ${C.borda}` }}>
                 <div style={{ fontSize: "20px", fontWeight: "700", color: cor }}>{n}</div>
@@ -701,9 +727,9 @@ function AppAutenticado() {
             return (
               <div key={nome} onClick={() => ir("status_aluno", { alunoAtual: nome, cenarioIdx: 0 })}
                 style={{ background: dados.status === "avaliado" ? "rgba(39,174,96,.06)"
-                  : dados.status === "andamento" ? "rgba(243,156,18,.06)"
+                  : dados.status === "andamento" ? "rgba(194,162,79,.06)"
                   : dados.status === "nao_realizou" ? "rgba(192,57,43,.06)" : C.card,
-                  border: `1.5px solid ${dados.status === "avaliado" ? "#27ae60"
+                  border: `1.5px solid ${dados.status === "avaliado" ? "#1e8449"
                     : dados.status === "andamento" ? C.ouro
                     : dados.status === "nao_realizou" ? C.vermelho : C.borda}`,
                   borderRadius: "12px", padding: "13px 15px", marginBottom: "8px",
@@ -716,7 +742,7 @@ function AppAutenticado() {
         </Wrap>
         {/* O botão agora fica visível de qualquer jeito para permitir o avanço */}
         <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.borda}`, background: C.bg }}>
-          <Btn cor="#27ae60" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
+          <Btn cor="#1e8449" onClick={() => ir("confirmar_envio")} style={{ marginBottom: 0 }}>
             Enviar Avaliações →
           </Btn>
         </div>
@@ -741,15 +767,15 @@ function AppAutenticado() {
           <div style={{ fontSize: "12px", color: C.sub, marginBottom: "40px", textAlign: "center" }}>
             {s.alunos[s.alunoAtual]?.status === "andamento" ? "Esta avaliação está em andamento." : "Selecione para iniciar"}
           </div>
-          <Btn cor="#27ae60" onClick={() => {
+          <Btn cor="#1e8449" onClick={() => {
             const atual = s.alunos[s.alunoAtual] || alunoVazio();
             set({ alunos: { ...s.alunos, [s.alunoAtual]: { ...atual, status: "andamento" } }, cenarioIdx: 0 });
             ir("cenario");
-          }}>✓ {s.alunos[s.alunoAtual]?.status === "andamento" ? "Continuar" : "Realizou — Iniciar"}</Btn>
-          <Btn cor={C.vermelho} onClick={() => {
+          }}><Ico name="check" size={18} w={2.2} />{s.alunos[s.alunoAtual]?.status === "andamento" ? "Continuar" : "Realizou — Iniciar"}</Btn>
+          <Btn cor={C.vermelho} outline onClick={() => {
             set({ alunos: { ...s.alunos, [s.alunoAtual]: { ...alunoVazio(), status: "nao_realizou" } } });
             ir(voltarTela);
-          }}>✗ Não Realizou</Btn>
+          }}><Ico name="x" size={18} w={2.2} />Não Realizou</Btn>
         </Wrap>
         <Footer />
       </div>
@@ -773,14 +799,14 @@ function AppAutenticado() {
                 textTransform: "uppercase" }}>{cenario.titulo}</span>
               <span style={{ fontSize: "10px", color: C.sub }}>{Math.round(progresso)}%</span>
             </div>
-            <div style={{ background: "#e0ddd8", borderRadius: "2px", height: "5px" }}>
+            <div style={{ background: "#d8d6cc", borderRadius: "2px", height: "5px" }}>
               <div style={{ background: C.verde, height: "100%", borderRadius: "2px",
                 width: `${progresso}%`, transition: "width .3s" }} />
             </div>
             <div style={{ display: "flex", gap: "4px", marginTop: "5px" }}>
               {cenarios.map((_, i) => (
                 <div key={i} style={{ flex: 1, height: "3px", borderRadius: "2px",
-                  background: i < s.cenarioIdx ? C.verde : i === s.cenarioIdx ? `${C.verde}66` : "#e0ddd8" }} />
+                  background: i < s.cenarioIdx ? C.verde : i === s.cenarioIdx ? `${C.verde}66` : "#d8d6cc" }} />
               ))}
             </div>
           </div>
@@ -798,7 +824,7 @@ function AppAutenticado() {
               style={{ background: "none", border: "none", color: C.ouro, fontSize: "11px",
                 cursor: "pointer", letterSpacing: "1px", fontFamily: "Inter, sans-serif",
                 display: "flex", alignItems: "center", gap: "4px" }}>
-              ℹ️ {s.ndacaAberto ? "Fechar" : "Ver conceituação NDACA"}
+              <Ico name="info" size={13} color={C.ouro} />{" "}{s.ndacaAberto ? "Fechar" : "Ver conceituação NDACA"}
             </button>
             {s.ndacaAberto && (
               <div style={{ marginTop: "12px", borderTop: `1px solid ${C.borda}`, paddingTop: "12px" }}>
@@ -818,7 +844,7 @@ function AppAutenticado() {
             const selecionada = respostaAtual?.letra === opcao.letra;
             const cores = {
               A:  { bg: selecionada ? "rgba(28,58,28,.1)"  : C.card, borda: selecionada ? C.verde   : C.borda, badge: C.verde,    txt: "#fff" },
-              B:  { bg: selecionada ? "rgba(201,168,76,.1)": C.card, borda: selecionada ? C.ouro    : C.borda, badge: C.ouro,     txt: "#fff" },
+              B:  { bg: selecionada ? "rgba(194,162,79,.1)": C.card, borda: selecionada ? C.ouro    : C.borda, badge: C.ouro,     txt: "#fff" },
               C:  { bg: selecionada ? "rgba(192,57,43,.1)" : C.card, borda: selecionada ? C.vermelho: C.borda, badge: C.vermelho, txt: "#fff" },
               NO: { bg: selecionada ? "rgba(0,0,0,.06)"    : C.card, borda: selecionada ? C.sub     : C.borda, badge: C.sub,      txt: "#fff" },
             }[opcao.letra];
@@ -859,10 +885,10 @@ function AppAutenticado() {
     const alunoData = s.alunos[s.alunoAtual] || alunoVazio();
     const foOpcoes = [
       { val: "nenhum", label: "Nenhum fato relevante", sub: "Avaliação segue normalmente", icone: "—" },
-      { val: "pos1", label: "Fato Positivo +0,5", sub: "Comportamento excepcional observado", icone: "✅" },
-      { val: "pos2", label: "Fato Positivo +1,0", sub: "Dois comportamentos excepcionais", icone: "✅✅" },
-      { val: "neg1", label: "Fato Negativo −0,5", sub: "Comportamento preocupante", icone: "❌" },
-      { val: "neg2", label: "Fato Negativo −1,0", sub: "Dois comportamentos preocupantes", icone: "❌❌" },
+      { val: "pos1", label: "Fato Positivo +0,5", sub: "Comportamento excepcional observado", icone: "+" },
+      { val: "pos2", label: "Fato Positivo +1,0", sub: "Dois comportamentos excepcionais", icone: "++" },
+      { val: "neg1", label: "Fato Negativo −0,5", sub: "Comportamento preocupante", icone: "−" },
+      { val: "neg2", label: "Fato Negativo −1,0", sub: "Dois comportamentos preocupantes", icone: "−−" },
     ];
 
     return (
@@ -890,7 +916,7 @@ function AppAutenticado() {
                   <div style={{ textAlign: "left" }}>
                     <div style={{ fontSize: "10px", color: atrib.cor, letterSpacing: "1px",
                       fontWeight: "700", textTransform: "uppercase" }}>{atrib.nome}</div>
-                    <div style={{ fontSize: "12px", color: temFO ? "#c9a84c" : C.sub, marginTop: "2px" }}>
+                    <div style={{ fontSize: "12px", color: temFO ? "#9a7420" : C.sub, marginTop: "2px" }}>
                       {temFO ? foOpcoes.find(o => o.val === foAtual)?.label : "Nenhum fato observado"}
                     </div>
                   </div>
@@ -987,7 +1013,7 @@ function AppAutenticado() {
           {/* Escala NDACA */}
           <div style={{ background: C.card, borderRadius: "12px", padding: "12px 15px",
             display: "flex", border: `1.5px solid ${C.borda}`, marginBottom: "16px" }}>
-            {[["I","0",C.vermelho],[  "R","1–4",C.laranja],["B","5–7",C.azul],["MB","8–10","#27ae60"]].map(([m,n,cor]) => (
+            {[["I","0",C.vermelho],[  "R","1–4",C.laranja],["B","5–7",C.azul],["MB","8–10","#1e8449"]].map(([m,n,cor]) => (
               <div key={m} style={{ flex: 1, textAlign: "center", borderRight: `1px solid ${C.borda}` }}
                 className="last:border-none">
                 <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "18px", fontWeight: "900", color: cor }}>{m}</div>
@@ -1007,11 +1033,11 @@ function AppAutenticado() {
               minHeight: "80px", resize: "none", boxSizing: "border-box",
               fontFamily: "Inter, sans-serif", marginBottom: "16px" }} />
 
-          <Btn cor="#27ae60" onClick={() => {
+          <Btn cor="#1e8449" onClick={() => {
             const alunoFinal = { ...s.alunos[s.alunoAtual], status: "avaliado", resultados };
             set({ alunos: { ...s.alunos, [s.alunoAtual]: alunoFinal } });
             ir(voltarTela);
-          }}>✓ Salvar e Próximo Aluno</Btn>
+          }}>Salvar e Próximo Aluno</Btn>
         </Wrap>
         <Footer />
       </div>
@@ -1025,12 +1051,13 @@ function AppAutenticado() {
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
         <Header titulo="Confirmar Envio" onVoltar={() => ir(voltarTela)} tipo={s.modo} />
         <Wrap style={{ paddingTop: "24px" }}>
-          <div style={{ background: "rgba(201,168,76,.1)", border: `1.5px solid ${C.ouro}44`,
+          <div style={{ background: "rgba(194,162,79,.1)", border: `1.5px solid ${C.ouro}44`,
             borderRadius: "14px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
-            <div style={{ fontSize: "36px", marginBottom: "10px" }}>⚠️</div>
+            <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(194,162,79,0.15)", color: C.ouro,
+              display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}><Ico name="alert" size={24} w={2} /></div>
             <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "17px",
               fontWeight: "700", color: C.verde, marginBottom: "8px" }}>Atenção</div>
-            <div style={{ fontSize: "13px", color: "#7a6a3a", lineHeight: "1.7" }}>
+            <div style={{ fontSize: "13px", color: "#9a7420", lineHeight: "1.7" }}>
               Ao confirmar, as avaliações serão registradas<br />
               e <strong style={{ color: C.verde }}>não poderão mais ser editadas</strong> por este aplicativo.
             </div>
@@ -1042,8 +1069,8 @@ function AppAutenticado() {
               s.modo !== "ATLETAS" && ["Curso", s.curso],
               s.modo !== "ATLETAS" && ["Turma", s.turma],
               s.modo !== "ATLETAS" && s.grupamentoSel && ["Grupamento", s.grupamentoSel],
-              ["✅ Avaliados", String(qtdAv)],
-              ["❌ Não realizou", String(qtdNR)],
+              ["Avaliados", String(qtdAv)],
+              ["Não realizou", String(qtdNR)],
             ].filter(Boolean).map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between",
                 padding: "7px 0", borderBottom: `1px solid ${C.borda}`, fontSize: "13px" }}>
@@ -1056,10 +1083,10 @@ function AppAutenticado() {
           {s.erroEnvio && (
             <div style={{ background: "rgba(192,57,43,.1)", border: `1px solid ${C.vermelho}`,
               borderRadius: "10px", padding: "12px", marginBottom: "12px",
-              fontSize: "13px", color: C.vermelho }}>⚠️ {s.erroEnvio}</div>
+              fontSize: "13px", color: C.vermelho }}>{s.erroEnvio}</div>
           )}
 
-          <Btn cor="#27ae60" disabled={s.enviando} onClick={async () => {
+          <Btn cor="#1e8449" disabled={s.enviando} onClick={async () => {
             try {
               set({ enviando: true, erroEnvio: null });
               
@@ -1131,7 +1158,7 @@ function AppAutenticado() {
             } catch (e) {
               set({ enviando: false, erroEnvio: `Erro interno: ${e.message}` });
             }
-          }}>{s.enviando ? "Enviando..." : "✓ Confirmar e Enviar"}</Btn>
+          }}>{s.enviando ? "Enviando..." : "Confirmar e Enviar"}</Btn>
         </Wrap>
         <Footer />
       </div>
@@ -1143,12 +1170,13 @@ function AppAutenticado() {
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <Header titulo="Enviado!" tipo={s.modo} />
       <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "48px" }}>
-        <div style={{ fontSize: "64px", marginBottom: "16px" }}>✅</div>
+        <div style={{ width: "78px", height: "78px", borderRadius: "50%", background: C.verdeOk, color: "#fff",
+          display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}><Ico name="check" size={38} w={2.4} /></div>
         <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "22px", fontWeight: "900",
           color: C.verde, marginBottom: "8px" }}>Avaliações Registradas!</div>
         <div style={{ fontSize: "14px", color: C.sub, lineHeight: "1.8", textAlign: "center", marginBottom: "40px" }}>
           {s.modo === "ATLETAS" ? "Equipe de Salto" : `${s.turma}`}<br />
-          <span style={{ color: "#27ae60", fontWeight: "600" }}>{qtdAv} avaliados</span>
+          <span style={{ color: "#1e8449", fontWeight: "600" }}>{qtdAv} avaliados</span>
           {qtdNR > 0 && <> · <span style={{ color: C.vermelho, fontWeight: "600" }}>{qtdNR} não realizaram</span></>}
         </div>
         <Btn onClick={() => setS({ ...appInicial(), perfil: s.perfil, instrutor: s.instrutor })}>

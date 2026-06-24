@@ -8,20 +8,22 @@ import { auth } from "./firebase.js";
 import { LOGOS } from "./logos.js";
 
 const C = {
-  bg:      "#f4f1eb",
+  bg:      "#eceae2",
   card:    "#ffffff",
-  verde:   "#1c3a1c",
-  ouro:    "#c9a84c",
-  texto:   "#1a1a1a",
-  sub:     "#9a9a8a",
-  borda:   "#ece9e2",
+  field:   "#f6f5ef",
+  verde:   "#142a1e",
+  verde2:  "#1b3a2a",
+  ouro:    "#c2a24f",
+  texto:   "#16180f",
+  sub:     "#7d8174",
+  borda:   "#dcdbd1",
   vermelho:"#c0392b",
 };
 
 const Input = ({ label, type = "text", value, onChange, placeholder }) => (
   <div style={{ marginBottom: "16px" }}>
-    <div style={{ fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase",
-      color: C.ouro, fontWeight: "700", marginBottom: "6px" }}>{label}</div>
+    <div style={{ fontSize: "10px", letterSpacing: "0.14em", textTransform: "uppercase",
+      color: C.ouro, fontWeight: "600", marginBottom: "7px" }}>{label}</div>
     <input
       type={type}
       value={value}
@@ -29,9 +31,9 @@ const Input = ({ label, type = "text", value, onChange, placeholder }) => (
       placeholder={placeholder}
       style={{
         width: "100%", boxSizing: "border-box",
-        border: `1.5px solid ${C.borda}`, borderRadius: "10px",
+        border: `1px solid ${C.borda}`, borderRadius: "9px",
         padding: "13px 14px", fontSize: "15px", color: C.texto,
-        background: "#fff", outline: "none", fontFamily: "inherit",
+        background: C.field, outline: "none", fontFamily: "inherit",
       }}
     />
   </div>
@@ -39,16 +41,16 @@ const Input = ({ label, type = "text", value, onChange, placeholder }) => (
 
 const Btn = ({ children, onClick, disabled, outline }) => (
   <button onClick={onClick} disabled={disabled} style={{
-    width: "100%", border: outline ? `2px solid ${C.verde}` : "none",
-    background: outline ? "transparent" : disabled ? "#ccc" : C.verde,
-    color: outline ? C.verde : "#fff",
-    borderRadius: "14px", padding: "16px",
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontSize: "17px", fontWeight: "700", letterSpacing: "1.5px",
+    width: "100%", border: outline ? `1.5px solid ${C.verde2}` : "none",
+    background: outline ? "transparent" : disabled ? "#cfcdc4" : C.verde2,
+    color: outline ? C.verde2 : "#fff",
+    borderRadius: "9px", padding: "15px",
+    fontFamily: "'Inter', sans-serif",
+    fontSize: "13px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase",
     cursor: disabled ? "not-allowed" : "pointer",
-    marginBottom: "12px",
-    boxShadow: outline || disabled ? "none" : `0 3px 12px ${C.verde}44`,
-    opacity: disabled ? 0.6 : 1,
+    marginBottom: "11px",
+    boxShadow: "none",
+    opacity: disabled ? 0.55 : 1,
   }}>{children}</button>
 );
 
@@ -115,8 +117,7 @@ export default function TelaLogin() {
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <div style={{ background: C.verde }}>
-        <div style={{ background: `linear-gradient(90deg,${C.ouro}99,${C.ouro},${C.ouro}99)`, height: "3px" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "11px", padding: "14px 16px" }}>
           <img src={LOGOS.secequi} style={{ width: "34px", height: "34px", objectFit: "contain" }} alt="logo" />
           <div>
             <div style={{ fontSize: "9px", letterSpacing: "2px", color: C.ouro, textTransform: "uppercase" }}>
