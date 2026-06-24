@@ -8,12 +8,14 @@ import { auth } from "./firebase.js";
 import { LOGOS } from "./logos.js";
 
 const C = {
+  bg:      "#eceae2",
+  card:    "#ffffff",
+  field:   "#f6f5ef",
   verde:   "#142a1e",
   verde2:  "#1b3a2a",
   ouro:    "#c2a24f",
   texto:   "#16180f",
   sub:     "#7d8174",
-  field:   "#f6f5ef",
   borda:   "#dcdbd1",
   vermelho:"#c0392b",
 };
@@ -21,7 +23,7 @@ const C = {
 const Input = ({ label, type = "text", value, onChange, placeholder }) => (
   <div style={{ marginBottom: "16px" }}>
     <div style={{ fontSize: "10px", letterSpacing: "0.14em", textTransform: "uppercase",
-      color: C.sub, fontWeight: "600", marginBottom: "7px" }}>{label}</div>
+      color: C.ouro, fontWeight: "600", marginBottom: "7px" }}>{label}</div>
     <input
       type={type}
       value={value}
@@ -39,8 +41,7 @@ const Input = ({ label, type = "text", value, onChange, placeholder }) => (
 
 const Btn = ({ children, onClick, disabled, outline }) => (
   <button onClick={onClick} disabled={disabled} style={{
-    width: "100%",
-    border: outline ? `1.5px solid ${C.verde2}` : "none",
+    width: "100%", border: outline ? `1.5px solid ${C.verde2}` : "none",
     background: outline ? "transparent" : disabled ? "#cfcdc4" : C.verde2,
     color: outline ? C.verde2 : "#fff",
     borderRadius: "9px", padding: "15px",
@@ -48,6 +49,7 @@ const Btn = ({ children, onClick, disabled, outline }) => (
     fontSize: "13px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase",
     cursor: disabled ? "not-allowed" : "pointer",
     marginBottom: "11px",
+    boxShadow: "none",
     opacity: disabled ? 0.55 : 1,
   }}>{children}</button>
 );
@@ -66,13 +68,15 @@ const msgErro = (code) => {
 };
 
 export default function TelaLogin() {
-  const [modo, setModo] = useState("login");
+  const [modo, setModo] = useState("login"); // login | cadastro
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
+
+  const limpar = () => { setErro(""); };
 
   const alternarModo = () => {
     setModo(m => m === "login" ? "cadastro" : "login");
@@ -81,7 +85,7 @@ export default function TelaLogin() {
   };
 
   const handleLogin = async () => {
-    setErro("");
+    limpar();
     if (!email || !senha) { setErro("Preencha e-mail e senha."); return; }
     setCarregando(true);
     try {
@@ -94,7 +98,7 @@ export default function TelaLogin() {
   };
 
   const handleCadastro = async () => {
-    setErro("");
+    limpar();
     if (!nome || !email || !senha || !confirmar) { setErro("Preencha todos os campos."); return; }
     if (senha !== confirmar) { setErro("As senhas não coincidem."); return; }
     if (senha.length < 6) { setErro("Senha fraca. Use ao menos 6 caracteres."); return; }
@@ -110,94 +114,81 @@ export default function TelaLogin() {
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: C.verde,
-      display: "flex",
-      flexDirection: "column",
-    }}>
-      {/* Área verde — logo e título */}
-      <div style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "48px 24px 32px",
-      }}>
-        <img
-          src={LOGOS.secequi}
-          style={{ width: "80px", height: "80px", objectFit: "contain", marginBottom: "20px",
-            filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.35))" }}
-          alt="SEC EQUI"
-        />
-
-        <div style={{
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontSize: "46px", fontWeight: "900", color: "#fff",
-          letterSpacing: "8px", marginBottom: "12px",
-        }}>
-          FOAL
-        </div>
-
-        {/* "— AVALIAÇÃO DA LIDERANÇA —" */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{ width: "28px", height: "1px", background: C.ouro }} />
-          <div style={{
-            fontSize: "9.5px", letterSpacing: "0.22em", textTransform: "uppercase",
-            color: C.ouro, fontWeight: "600",
-          }}>
-            Avaliação da Liderança
+    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
+      {/* Header */}
+      <div style={{ background: C.verde }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "11px", padding: "14px 16px" }}>
+          <img src={LOGOS.secequi} style={{ width: "34px", height: "34px", objectFit: "contain" }} alt="logo" />
+          <div>
+            <div style={{ fontSize: "9px", letterSpacing: "2px", color: C.ouro, textTransform: "uppercase" }}>
+              Seção de Equitação · ESA
+            </div>
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "16px", fontWeight: "900", color: "#fff" }}>
+              FOAL
+            </div>
           </div>
-          <div style={{ width: "28px", height: "1px", background: C.ouro }} />
         </div>
       </div>
 
-      {/* Card branco — formulário */}
-      <div style={{
-        background: "#fff",
-        borderRadius: "24px 24px 0 0",
-        padding: "32px 24px 40px",
-        boxShadow: "0 -4px 32px rgba(0,0,0,0.18)",
-      }}>
-        <div style={{
-          fontSize: "9px", letterSpacing: "0.25em", textTransform: "uppercase",
-          color: C.sub, fontWeight: "700", marginBottom: "24px", textAlign: "center",
-        }}>
-          {modo === "login" ? "Acesso ao Sistema" : "Criar Conta"}
+      {/* Corpo */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+        padding: "40px 24px 24px" }}>
+
+        <img src={LOGOS.secequi} style={{ width: "80px", height: "80px", objectFit: "contain",
+          marginBottom: "12px", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.12))" }} alt="logo" />
+
+        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "28px", fontWeight: "900",
+          color: C.verde, letterSpacing: "3px", marginBottom: "4px" }}>FOAL</div>
+
+        <div style={{ fontSize: "11px", color: C.sub, letterSpacing: "1px", textAlign: "center",
+          lineHeight: "1.7", marginBottom: "4px" }}>
+          Ferramenta de Observação e<br />Avaliação da <span style={{ color: C.ouro, fontWeight: "600" }}>Liderança</span>
         </div>
 
-        {modo === "cadastro" && (
-          <Input label="Nome completo" value={nome} onChange={setNome} placeholder="Seu nome" />
-        )}
-        <Input label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" />
-        <Input label="Senha" type="password" value={senha} onChange={setSenha} placeholder="••••••" />
-        {modo === "cadastro" && (
-          <Input label="Confirmar senha" type="password" value={confirmar}
-            onChange={setConfirmar} placeholder="••••••" />
-        )}
+        <div style={{ width: "40px", height: "2px", background: `linear-gradient(90deg,${C.ouro},${C.verde})`,
+          borderRadius: "2px", margin: "16px 0 28px" }} />
 
-        {erro && (
-          <div style={{
-            background: "rgba(192,57,43,0.08)", border: `1px solid ${C.vermelho}44`,
-            borderRadius: "8px", padding: "10px 12px", marginBottom: "16px",
-            color: C.vermelho, fontSize: "12px", textAlign: "center",
-          }}>
-            {erro}
+        {/* Card de auth */}
+        <div style={{ width: "100%", maxWidth: "400px", background: C.card, borderRadius: "16px",
+          padding: "24px", border: `1.5px solid ${C.borda}`, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
+
+          <div style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase",
+            color: C.ouro, fontWeight: "700", marginBottom: "20px", textAlign: "center" }}>
+            {modo === "login" ? "ACESSO AO SISTEMA" : "CRIAR CONTA"}
           </div>
-        )}
 
-        <Btn onClick={modo === "login" ? handleLogin : handleCadastro} disabled={carregando}>
-          {carregando ? "Aguarde..." : modo === "login" ? "Entrar" : "Cadastrar"}
-        </Btn>
-        <Btn outline onClick={alternarModo} disabled={carregando}>
-          {modo === "login" ? "Criar conta" : "Já tenho conta"}
-        </Btn>
+          {modo === "cadastro" && (
+            <Input label="Nome completo" value={nome} onChange={setNome} placeholder="Seu nome" />
+          )}
+          <Input label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" />
+          <Input label="Senha" type="password" value={senha} onChange={setSenha} placeholder="••••••" />
+          {modo === "cadastro" && (
+            <Input label="Confirmar senha" type="password" value={confirmar}
+              onChange={setConfirmar} placeholder="••••••" />
+          )}
 
-        <div style={{ textAlign: "center", marginTop: "8px", fontSize: "9px", color: C.sub, letterSpacing: "0.5px" }}>
-          Desenvolvido por <strong style={{ color: C.verde }}>Cap Cav Arlison Andrade do Vale</strong>
-          {" "}· ESA · 2026
+          {erro && (
+            <div style={{ background: "rgba(192,57,43,0.08)", border: `1px solid ${C.vermelho}44`,
+              borderRadius: "8px", padding: "10px 12px", marginBottom: "16px",
+              color: C.vermelho, fontSize: "12px", textAlign: "center" }}>
+              {erro}
+            </div>
+          )}
+
+          <Btn onClick={modo === "login" ? handleLogin : handleCadastro} disabled={carregando}>
+            {carregando ? "Aguarde..." : modo === "login" ? "ENTRAR" : "CADASTRAR"}
+          </Btn>
+          <Btn outline onClick={alternarModo} disabled={carregando}>
+            {modo === "login" ? "Criar conta" : "Já tenho conta"}
+          </Btn>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ borderTop: `1px solid ${C.borda}`, padding: "12px 16px", textAlign: "center",
+        fontSize: "9px", color: C.sub, letterSpacing: "0.5px" }}>
+        Desenvolvido por <strong style={{ color: C.verde }}>Cap Cav Arlison Andrade do Vale</strong>
+        {" "}· Seção de Equitação · ESA · 2026
       </div>
     </div>
   );
