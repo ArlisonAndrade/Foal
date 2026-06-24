@@ -19,9 +19,12 @@ import random
 import time
 
 # ── CONFIGURAÇÃO ──────────────────────────────────────────────
-import requests
+import os
+import dotenv # type: ignore
 
-NOTION_API_KEY = "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"
+dotenv.load_dotenv()
+
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 DATABASE_ID    = "379a5d54-81f1-8054-8473-e868f63abb8a" # ID confirmado pelo radar
 
 HEADERS = {
