@@ -10,23 +10,63 @@ Calibragem: B=0.8 (novo padrão)
 - Atletas: 7.0-9.0   — muito mais horas de sela
 """
 
+import argparse
+import os
+import re
+import sys
 import requests
 import random
 import time
 
 # ── CONFIGURAÇÃO ──────────────────────────────────────────────
-NOTION_API_KEY    = "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"
-DATABASE_ID       = "364a5d54-81f1-80b8-83ee-cca3ef89bc76"
+import requests
+
+NOTION_API_KEY = "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"
+DATABASE_ID    = "379a5d54-81f1-8054-8473-e868f63abb8a" # ID confirmado pelo radar
+
 HEADERS = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
     "Content-Type": "application/json",
-    "Notion-Version": "2025-09-03",
+    "Notion-Version": "2022-06-28",
 }
+
+
+def carregar_config(database_id_override=None):
+    global DATABASE_ID, HEADERS
+
+    if database_id_override:
+        DATABASE_ID = extrair_database_id(database_id_override)
+
+    if not NOTION_API_KEY:
+        print("Erro: variável de ambiente NOTION_API_KEY não está definida.")
+        sys.exit(1)
+
+    if not DATABASE_ID:
+        print("Erro: variável de ambiente NOTION_DATABASE_ID não está definida e nenhum database foi informado.")
+        sys.exit(1)
+
+    HEADERS = {
+        "Authorization": f"Bearer {NOTION_API_KEY}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    print(f"Usando Notion database: {DATABASE_ID}")
+    print(f"Notion-Version: {"2022-06-28"}")
+
+
+def extrair_database_id(texto):
+    if not texto:
+        return texto
+
+    match = re.search(r"([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|[0-9a-fA-F]{32})", texto)
+    if not match:
+        return texto
+
+    return match.group(1).replace("-", "")
 
 # ── ATLETAS (nomes de guerra) ─────────────────────────────────
 ATLETAS = {
-    "SCARABEL", "G FERREIRA", "LUCAS", "BRASIL",
-    "LOBATO", "REZENDE", "VASCONCELOS", "PIROLLI"
+    "ANTONIO", "G FERREIRA", "LUCAS", "SANTOS FILHO"
 }
 
 # ── GERAÇÃO DE NOTAS ─────────────────────────────────────────
@@ -79,7 +119,20 @@ def buscar_todos_alunos():
     payload = {"page_size": 100}
 
     while True:
-        resp = requests.post(url, headers=HEADERS, json=payload)
+        try:
+            resp = requests.post(url, headers=HEADERS, json=payload, timeout=30)
+        except requests.RequestException as exc:
+            print(f"Erro de conexão ao consultar o banco Notion: {exc}")
+            return []
+
+        if resp.status_code != 200:
+            print(f"Erro na consulta do banco: HTTP {resp.status_code}")
+            try:
+                print(resp.json())
+            except ValueError:
+                print(resp.text)
+            return []
+
         data = resp.json()
 
         if "results" not in data:
@@ -90,11 +143,11 @@ def buscar_todos_alunos():
             props = page.get("properties", {})
             aluno = {
                 "id": page["id"],
-                "nome": props.get("Nome Completo", {}).get("title", [{}])[0].get("plain_text", ""),
-                "nome_guerra": props.get("Nome de Guerra", {}).get("rich_text", [{}])[0].get("plain_text", ""),
-                "turma": props.get("Turma", {}).get("select", {}).get("name", ""),
-                "curso": props.get("Curso", {}).get("select", {}).get("name", ""),
-                "status": props.get("Status", {}).get("select", {}).get("name", ""),
+                "nome": props.get("Nome Completo", {}).get("title", [{}])[0].get("plain_text", "") if props.get("Nome Completo", {}).get("title") else "",
+                "nome_guerra": props.get("Nome de Guerra", {}).get("rich_text", [{}])[0].get("plain_text", "") if props.get("Nome de Guerra", {}).get("rich_text") else "",
+                "turma": (props.get("Turma", {}).get("select") or {}).get("name", ""),
+                "curso": (props.get("Curso", {}).get("select") or {}).get("name", ""),
+                "status": (props.get("Status", {}).get("select") or {}).get("name", ""),
                 "coragem": props.get("Coragem - Nota", {}).get("number"),
             }
             alunos.append(aluno)
@@ -115,11 +168,28 @@ def atualizar_aluno(page_id, notas, momento="1ª Avaliação", avaliador="Cap Ca
         "Adaptabilidade - Nota":        {"number": notas["Adaptabilidade - Nota"]},
         "Persistência - Nota":          {"number": notas["Persistência - Nota"]},
     }
-    resp = requests.patch(url, headers=HEADERS, json={"properties": props})
-    return resp.status_code == 200
+    try:
+        resp = requests.patch(url, headers=HEADERS, json={"properties": props}, timeout=30)
+    except requests.RequestException as exc:
+        print(f"Erro de conexão ao atualizar aluno {page_id}: {exc}")
+        return False
+
+    if resp.status_code != 200:
+        print(f"Erro ao atualizar aluno {page_id}: HTTP {resp.status_code}")
+        try:
+            print(resp.json())
+        except ValueError:
+            print(resp.text)
+        return False
+    return True
 
 # ── EXECUÇÃO PRINCIPAL ────────────────────────────────────────
 def main():
+    parser = argparse.ArgumentParser(description="Popula notas no Notion usando outro banco de dados ou URL do Notion.")
+    parser.add_argument("-d", "--database", help="ID ou URL do database do Notion a ser usado")
+    args = parser.parse_args()
+
+    carregar_config(database_id_override=args.database)
     random.seed(42)  # Reproduzível
 
     print("🐴 FOAL — Populando notas no Notion")

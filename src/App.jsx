@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "./firebase.js";
+import { useAuth } from "./AuthContext.jsx";
+import TelaLogin from "./TelaLogin.jsx";
 import { LOGOS } from "./logos.js";
 import { CURSOS, ATLETAS } from "./dados.js";
 import {
@@ -145,6 +149,22 @@ const appInicial = () => ({
 });
 
 export default function App() {
+  const { user } = useAuth();
+
+  if (user === undefined) return (
+    <div style={{ minHeight: "100vh", background: "#f4f1eb", display: "flex",
+      alignItems: "center", justifyContent: "center", color: "#9a9a8a", fontSize: "14px" }}>
+      Carregando...
+    </div>
+  );
+
+  if (user === null) return <TelaLogin />;
+
+  return <AppAutenticado />;
+}
+
+function AppAutenticado() {
+  const { user } = useAuth();
   const [s, setS] = useState(appInicial());
 
   const set = (updates) => setS(prev => ({ ...prev, ...updates }));
@@ -185,6 +205,18 @@ export default function App() {
           <Btn outline cor={C.verde} onClick={() => ir("instrutor", { perfil: "avaliador" })} style={{ marginBottom: 0 }}>
             📋&nbsp; AVALIADOR
           </Btn>
+        </div>
+        <div style={{ marginTop: "24px", textAlign: "center" }}>
+          <div style={{ fontSize: "11px", color: C.sub, marginBottom: "8px" }}>
+            {user.displayName || user.email}
+          </div>
+          <button onClick={() => signOut(auth)} style={{
+            background: "none", border: `1px solid ${C.borda}`, borderRadius: "8px",
+            padding: "6px 16px", fontSize: "11px", color: C.sub, cursor: "pointer",
+            letterSpacing: "1px",
+          }}>
+            Sair
+          </button>
         </div>
       </div>
       <Footer />
