@@ -145,7 +145,7 @@ const appInicial = () => ({
   enviando: false,
   erroEnvio: null,
   turmasEnviadas: JSON.parse(localStorage.getItem("foal_enviadas") || "{}"),
-  instrutor: "",
+  instrutor: localStorage.getItem("foal_instrutor") || "",
 });
 
 export default function App() {
@@ -158,8 +158,7 @@ export default function App() {
     </div>
   );
 
-  if (user === null) return <TelaLogin />;
-
+  // Sempre mostra o app — a home não exige autenticação
   return <AppAutenticado />;
 }
 
@@ -169,6 +168,18 @@ function AppAutenticado() {
 
   const set = (updates) => setS(prev => ({ ...prev, ...updates }));
   const ir = (tela, extra = {}) => set({ tela, ...extra });
+
+  // Após login via tela de avaliador, decide próximo passo
+  useEffect(() => {
+    if (user && s.tela === "aguardando_login") {
+      const instrutorSalvo = localStorage.getItem("foal_instrutor");
+      if (instrutorSalvo) {
+        set({ instrutor: instrutorSalvo, perfil: "avaliador", tela: "cursos" });
+      } else {
+        set({ perfil: "avaliador", tela: "instrutor" });
+      }
+    }
+  }, [user, s.tela]);
 
   const cenarios = s.modo === "ATLETAS" ? CENARIOS_ATLETAS : CENARIOS_CFGS;
   const atributos = s.modo === "ATLETAS" ? ATRIBUTOS_ATLETAS : ATRIBUTOS_CFGS;
@@ -202,28 +213,40 @@ function AppAutenticado() {
           borderRadius: "2px", margin: "20px 0 32px" }} />
         <div style={{ width: "100%" }}>
           <Btn onClick={() => ir("pin")}>🔐&nbsp; ADMINISTRADOR</Btn>
-          <Btn outline cor={C.verde} onClick={() => ir("instrutor", { perfil: "avaliador" })} style={{ marginBottom: 0 }}>
+          <Btn outline cor={C.verde} onClick={() => {
+            if (!user) { ir("aguardando_login"); return; }
+            const instrutorSalvo = localStorage.getItem("foal_instrutor");
+            if (instrutorSalvo) {
+              set({ instrutor: instrutorSalvo, perfil: "avaliador", tela: "cursos" });
+            } else {
+              ir("instrutor", { perfil: "avaliador" });
+            }
+          }} style={{ marginBottom: 0 }}>
             📋&nbsp; AVALIADOR
           </Btn>
         </div>
-        <div style={{ marginTop: "24px", textAlign: "center" }}>
-          <div style={{ fontSize: "11px", color: C.sub, marginBottom: "8px" }}>
-            {user.displayName || user.email}
+        {user && (
+          <div style={{ marginTop: "24px", textAlign: "center" }}>
+            <div style={{ fontSize: "11px", color: C.sub, marginBottom: "8px" }}>
+              {user.displayName || user.email}
+            </div>
+            <button onClick={() => signOut(auth)} style={{
+              background: "none", border: `1px solid ${C.borda}`, borderRadius: "8px",
+              padding: "6px 16px", fontSize: "11px", color: C.sub, cursor: "pointer",
+              letterSpacing: "1px",
+            }}>
+              Sair
+            </button>
           </div>
-          <button onClick={() => signOut(auth)} style={{
-            background: "none", border: `1px solid ${C.borda}`, borderRadius: "8px",
-            padding: "6px 16px", fontSize: "11px", color: C.sub, cursor: "pointer",
-            letterSpacing: "1px",
-          }}>
-            Sair
-          </button>
-        </div>
+        )}
       </div>
       <Footer />
     </div>
   );
 
-  // forçar deploy
+  // ── AGUARDANDO LOGIN (avaliador sem conta) ───────────────
+  if (s.tela === "aguardando_login") return <TelaLogin />;
+
   // ── PIN ───────────────────────────────────────────────────
   if (s.tela === "pin") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
@@ -287,7 +310,10 @@ function AppAutenticado() {
           style={{ width: "100%", background: C.card, border: `1.5px solid ${C.borda}`, borderRadius: "12px", padding: "14px 16px", fontSize: "16px", color: C.texto, boxSizing: "border-box", marginBottom: "24px", fontFamily: "Inter, sans-serif", outline: "none" }}
           autoFocus
         />
-        <Btn disabled={!s.instrutor.trim()} onClick={() => ir("cursos")}>
+        <Btn disabled={!s.instrutor.trim()} onClick={() => {
+          localStorage.setItem("foal_instrutor", s.instrutor.trim());
+          ir("cursos");
+        }}>
           Continuar →
         </Btn>
       </Wrap>
@@ -656,11 +682,10 @@ function AppAutenticado() {
 
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column", paddingBottom: todosConcluidos ? "80px" : "0" }}>
-        {/* CORREÇÃO: Removeu a palavra fixa para não duplicar com a variável do grupamento */}
         <Header titulo={s.grupamentoSel ? s.grupamentoSel : s.turma}
-          subtitulo={`${s.curso} · ${s.instrutor || ""}`} onVoltar={() => ir("turmas")} />
+          subtitulo={`${s.curso} · ${s.instrutor || ""}`}
+          onVoltar={() => s.grupamentoSel ? ir("escolher_grupamento") : ir("turmas")} />
         
-        {/* CORREÇÃO: Adicionado marginTop para dar o respiro visual e descolar do topo verde */}
         <Wrap>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "8px", marginBottom: "16px" }}>
             {[["#27ae60",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
@@ -1004,7 +1029,7 @@ function AppAutenticado() {
             borderRadius: "14px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
             <div style={{ fontSize: "36px", marginBottom: "10px" }}>⚠️</div>
             <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "17px",
-              fontWeight: "700", color: C.verde, marginBottom: "8px" }}>Atenção Teste Conexão</div>
+              fontWeight: "700", color: C.verde, marginBottom: "8px" }}>Atenção</div>
             <div style={{ fontSize: "13px", color: "#7a6a3a", lineHeight: "1.7" }}>
               Ao confirmar, as avaliações serão registradas<br />
               e <strong style={{ color: C.verde }}>não poderão mais ser editadas</strong> por este aplicativo.
