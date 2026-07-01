@@ -118,7 +118,7 @@ const Footer = () => (
 );
 
 const Wrap = ({ children, style }) => (
-  <div style={{ flex: 1, overflowY: "auto", padding: "32px 16px 24px", ...style }}>{children}</div>
+  <div style={{ flex: 1, overflowY: "auto", padding: "40px 16px 24px", ...style }}>{children}</div>
 );
 
 const SecLabel = ({ children }) => (
@@ -213,38 +213,61 @@ function AppAutenticado() {
 
   // ── HOME ──────────────────────────────────────────────────
   if (s.tela === "home") return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      <Header titulo="FOAL" />
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 24px 0" }}>
-        <img src={LOGOS.secequi} style={{ width: "110px", height: "110px", objectFit: "contain", marginBottom: "16px",
-          filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.15))" }} alt="SEC EQUI" />
+    <div style={{ minHeight: "100vh", background: C.verde, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: "40px 24px 32px" }}>
+
+      {/* Logo + título */}
+      <div style={{ textAlign: "center", marginBottom: "36px" }}>
+        <img src={LOGOS.secequi} style={{ width: "80px", height: "80px", objectFit: "contain",
+          marginBottom: "16px", filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.4))" }} alt="SEC EQUI" />
         <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "38px", fontWeight: "900",
-          color: C.verde, letterSpacing: "4px", marginBottom: "4px" }}>FOAL</div>
-        <div style={{ fontSize: "11px", color: C.sub, letterSpacing: "1px", textAlign: "center", lineHeight: "1.7", marginBottom: "8px" }}>
-          Ferramenta de Observação e<br />Avaliação da <span style={{ color: C.ouro, fontWeight: "600" }}>Liderança</span>
-        </div>
-        <div style={{ width: "56px", height: "2px", background: `linear-gradient(90deg,${C.ouro},${C.verde})`,
-          borderRadius: "2px", margin: "20px 0 32px" }} />
-        <div style={{ width: "100%" }}>
-          <Btn onClick={() => ir("pin")}><Ico name="lock" size={17} />ADMINISTRADOR</Btn>
-          <Btn outline cor={C.verde} onClick={() => ir("instrutor", { perfil: "avaliador" })} style={{ marginBottom: 0 }}>
-            <Ico name="clipboard" size={17} />AVALIADOR
-          </Btn>
-        </div>
-        <div style={{ marginTop: "24px", textAlign: "center" }}>
-          <div style={{ fontSize: "11px", color: C.sub, marginBottom: "8px" }}>
-            {user.displayName || user.email}
+          color: "#fff", letterSpacing: "5px", marginBottom: "8px" }}>FOAL</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "center" }}>
+          <div style={{ width: "28px", height: "1px", background: C.ouro, opacity: 0.7 }} />
+          <div style={{ fontSize: "9px", letterSpacing: "3px", color: C.ouro, textTransform: "uppercase", fontWeight: "600" }}>
+            Selecione o Perfil
           </div>
-          <button onClick={() => signOut(auth)} style={{
-            background: "none", border: `1px solid ${C.borda}`, borderRadius: "8px",
-            padding: "6px 16px", fontSize: "11px", color: C.sub, cursor: "pointer",
-            letterSpacing: "1px",
-          }}>
-            Sair
-          </button>
+          <div style={{ width: "28px", height: "1px", background: C.ouro, opacity: 0.7 }} />
         </div>
       </div>
-      <Footer />
+
+      {/* Cards de perfil */}
+      <div style={{ width: "100%", maxWidth: "380px", marginBottom: "32px" }}>
+        {[
+          { icon: "🔐", titulo: "Administrador", sub: "Montar grupos e gerir turmas", acao: () => ir("pin") },
+          { icon: "📋", titulo: "Avaliador", sub: "Aplicar avaliações em campo", acao: () => ir("instrutor", { perfil: "avaliador" }) },
+        ].map((item, i) => (
+          <div key={i} onClick={item.acao} style={{
+            display: "flex", alignItems: "center", gap: "16px",
+            background: "rgba(255,255,255,0.06)", borderRadius: "14px",
+            padding: "18px 20px", marginBottom: "10px",
+            border: "1px solid rgba(255,255,255,0.10)",
+            cursor: "pointer",
+          }}>
+            <div style={{ fontSize: "26px", width: "40px", textAlign: "center" }}>{item.icon}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "17px", fontWeight: "700",
+                color: "#fff", marginBottom: "3px" }}>{item.titulo}</div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", letterSpacing: "0.3px" }}>{item.sub}</div>
+            </div>
+            <div style={{ color: C.ouro, fontSize: "22px", opacity: 0.7 }}>›</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Usuário + sair */}
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "10px", letterSpacing: "0.5px" }}>
+          {user.displayName || user.email}
+        </div>
+        <button onClick={() => signOut(auth)} style={{
+          background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px",
+          padding: "7px 20px", fontSize: "10px", color: "rgba(255,255,255,0.45)",
+          cursor: "pointer", letterSpacing: "2px", textTransform: "uppercase",
+        }}>
+          Sair
+        </button>
+      </div>
     </div>
   );
 
@@ -253,7 +276,7 @@ function AppAutenticado() {
   if (s.tela === "pin") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <Header titulo="Administrador" subtitulo="Acesso restrito" onVoltar={() => ir("home")} />
-      <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "32px" }}>
+      <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 16px 24px" }}>
         <div style={{ width: "54px", height: "54px", borderRadius: "13px", background: C.verde, color: C.ouro,
           display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}><Ico name="lock" size={26} w={1.7} /></div>
         <div style={{ fontSize: "16px", fontWeight: "600", color: C.verde, marginBottom: "4px" }}>Digite o PIN</div>
@@ -298,7 +321,7 @@ function AppAutenticado() {
   if (s.tela === "instrutor") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <Header titulo="Avaliador" subtitulo="Identificação" onVoltar={() => ir("home")} />
-      <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "32px" }}>
+      <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 16px 24px" }}>
         <div style={{ width: "54px", height: "54px", borderRadius: "13px", background: "rgba(194,162,79,0.15)", color: C.ouro,
           display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px" }}><Ico name="user" size={26} w={1.7} /></div>
         <div style={{ fontSize: "16px", fontWeight: "600", color: C.verde, marginBottom: "4px" }}>
@@ -327,7 +350,7 @@ function AppAutenticado() {
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
         <Header titulo="Painel de Controle" subtitulo="Administrador" onVoltar={() => set(appInicial())} />
-        <Wrap style={{ paddingTop: "24px" }}>
+        <Wrap style={{ padding: "24px 16px 24px" }}>
           <div style={{ marginBottom: "24px", padding: "16px", background: C.card, borderRadius: "12px", borderLeft: `4px solid ${C.ouro}` }}>
             <div style={{ fontSize: "14px", color: C.sub }}>Bem-vindo de volta,</div>
             <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "20px", fontWeight: "900", color: C.texto }}>Olá, Cap Arlison!</div>
@@ -366,7 +389,7 @@ function AppAutenticado() {
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
         <Header titulo={`Configurar ${s.curso}`} subtitulo={s.grupoAtual} onVoltar={() => ir("dashboard_adm")} />
-        <Wrap style={{ paddingTop: "16px" }}>
+        <Wrap style={{ padding: "16px 16px 24px" }}>
           <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
             {["Grupamento A", "Grupamento B", "Grupamento C", "Grupamento D"].map(g => {
               const ativo = s.grupoAtual === g;
@@ -470,7 +493,7 @@ function AppAutenticado() {
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
         <Header titulo="Selecione o Grupo" subtitulo={s.curso} onVoltar={() => ir("cursos")} />
-        <Wrap style={{ paddingTop: "24px" }}>
+        <Wrap style={{ padding: "24px 16px 24px" }}>
           <div style={{ fontSize: "13px", color: C.sub, marginBottom: "16px" }}>Grupos montados pelo Administrador:</div>
           {Object.entries(gruposDesseCurso).map(([nomeGrupo, listaAlunos]) => {
             if (!listaAlunos || listaAlunos.length === 0) return null;
@@ -686,8 +709,7 @@ function AppAutenticado() {
         {/* CORREÇÃO: Removeu a palavra fixa para não duplicar com a variável do grupamento */}
         <Header titulo={s.grupamentoSel ? s.grupamentoSel : s.turma}
           subtitulo={`${s.curso} · ${s.instrutor || ""}`} onVoltar={() => ir("turmas")} />
-        
-        {/* CORREÇÃO: Adicionado marginTop para dar o respiro visual e descolar do topo verde */}
+
         <Wrap>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "8px", marginBottom: "16px" }}>
             {[["#1e8449",qtdAv,"Aval."],[C.ouro,qtdAnd,"Andam."],[C.sub,qtdPend,"Pend."],[C.vermelho,qtdNR,"NR"]].map(([cor,n,l]) => (
@@ -734,7 +756,7 @@ function AppAutenticado() {
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
         <Header titulo={s.alunoAtual} subtitulo={s.modo === "ATLETAS" ? "Equipe de Salto" : `${s.turma} · ${s.curso}`}
           onVoltar={() => ir(voltarTela)} tipo={s.modo} />
-        <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "40px" }}>
+        <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 16px 24px" }}>
           <img src={s.modo === "ATLETAS" ? LOGOS.atletas : LOGOS.secequi}
             style={{ width: "80px", height: "80px", objectFit: "contain", marginBottom: "20px", opacity: 0.6 }} alt="logo" />
           <div style={{ fontSize: "18px", fontWeight: "600", color: C.verde, marginBottom: "8px" }}>
@@ -1026,7 +1048,7 @@ function AppAutenticado() {
     return (
       <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
         <Header titulo="Confirmar Envio" onVoltar={() => ir(voltarTela)} tipo={s.modo} />
-        <Wrap style={{ paddingTop: "24px" }}>
+        <Wrap style={{ padding: "24px 16px 24px" }}>
           <div style={{ background: "rgba(194,162,79,.1)", border: `1.5px solid ${C.ouro}44`,
             borderRadius: "14px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
             <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "rgba(194,162,79,0.15)", color: C.ouro,
@@ -1145,7 +1167,7 @@ function AppAutenticado() {
   if (s.tela === "sucesso") return (
     <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
       <Header titulo="Enviado!" tipo={s.modo} />
-      <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "48px" }}>
+      <Wrap style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 16px 24px" }}>
         <div style={{ width: "78px", height: "78px", borderRadius: "50%", background: C.verdeOk, color: "#fff",
           display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}><Ico name="check" size={38} w={2.4} /></div>
         <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "22px", fontWeight: "900",
