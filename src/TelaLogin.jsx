@@ -114,81 +114,64 @@ export default function TelaLogin() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg, display: "flex", flexDirection: "column" }}>
-      {/* Header */}
-      <div style={{ background: C.verde }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "11px", padding: "14px 16px" }}>
-          <img src={LOGOS.secequi} style={{ width: "34px", height: "34px", objectFit: "contain" }} alt="logo" />
-          <div>
-            <div style={{ fontSize: "9px", letterSpacing: "2px", color: C.ouro, textTransform: "uppercase" }}>
-              Seção de Equitação · ESA
-            </div>
-            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "16px", fontWeight: "900", color: "#fff" }}>
-              FOAL
-            </div>
+    <div style={{ minHeight: "100vh", background: C.verde, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: "32px 24px" }}>
+
+      {/* Logo + título */}
+      <div style={{ textAlign: "center", marginBottom: "32px" }}>
+        <img src={LOGOS.secequi} style={{ width: "72px", height: "72px", objectFit: "contain",
+          marginBottom: "16px", filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.4))" }} alt="logo" />
+        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "36px", fontWeight: "900",
+          color: "#fff", letterSpacing: "5px", marginBottom: "6px" }}>FOAL</div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "center" }}>
+          <div style={{ width: "28px", height: "1px", background: C.ouro, opacity: 0.7 }} />
+          <div style={{ fontSize: "9px", letterSpacing: "3px", color: C.ouro, textTransform: "uppercase",
+            fontWeight: "600" }}>
+            {modo === "login" ? "Avaliação da Liderança" : "Criar conta"}
           </div>
+          <div style={{ width: "28px", height: "1px", background: C.ouro, opacity: 0.7 }} />
         </div>
       </div>
 
-      {/* Corpo */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
-        padding: "40px 24px 24px" }}>
+      {/* Card de auth */}
+      <div style={{ width: "100%", maxWidth: "380px", background: "#f6f5ef", borderRadius: "16px",
+        padding: "28px 24px 20px" }}>
 
-        <img src={LOGOS.secequi} style={{ width: "80px", height: "80px", objectFit: "contain",
-          marginBottom: "12px", filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.12))" }} alt="logo" />
-
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "28px", fontWeight: "900",
-          color: C.verde, letterSpacing: "3px", marginBottom: "4px" }}>FOAL</div>
-
-        <div style={{ fontSize: "11px", color: C.sub, letterSpacing: "1px", textAlign: "center",
-          lineHeight: "1.7", marginBottom: "4px" }}>
-          Ferramenta de Observação e<br />Avaliação da <span style={{ color: C.ouro, fontWeight: "600" }}>Liderança</span>
+        <div style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase",
+          color: C.ouro, fontWeight: "700", marginBottom: "20px", textAlign: "center" }}>
+          {modo === "login" ? "ACESSO AO SISTEMA" : "CRIAR CONTA"}
         </div>
 
-        <div style={{ width: "40px", height: "2px", background: `linear-gradient(90deg,${C.ouro},${C.verde})`,
-          borderRadius: "2px", margin: "16px 0 28px" }} />
+        {modo === "cadastro" && (
+          <Input label="Nome completo" value={nome} onChange={setNome} placeholder="Seu nome" />
+        )}
+        <Input label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" />
+        <Input label="Senha" type="password" value={senha} onChange={setSenha} placeholder="••••••" />
+        {modo === "cadastro" && (
+          <Input label="Confirmar senha" type="password" value={confirmar}
+            onChange={setConfirmar} placeholder="••••••" />
+        )}
 
-        {/* Card de auth */}
-        <div style={{ width: "100%", maxWidth: "400px", background: C.card, borderRadius: "16px",
-          padding: "24px", border: `1.5px solid ${C.borda}`, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}>
-
-          <div style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase",
-            color: C.ouro, fontWeight: "700", marginBottom: "20px", textAlign: "center" }}>
-            {modo === "login" ? "ACESSO AO SISTEMA" : "CRIAR CONTA"}
+        {erro && (
+          <div style={{ background: "rgba(192,57,43,0.08)", border: `1px solid ${C.vermelho}44`,
+            borderRadius: "8px", padding: "10px 12px", marginBottom: "16px",
+            color: C.vermelho, fontSize: "12px", textAlign: "center" }}>
+            {erro}
           </div>
+        )}
 
-          {modo === "cadastro" && (
-            <Input label="Nome completo" value={nome} onChange={setNome} placeholder="Seu nome" />
-          )}
-          <Input label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" />
-          <Input label="Senha" type="password" value={senha} onChange={setSenha} placeholder="••••••" />
-          {modo === "cadastro" && (
-            <Input label="Confirmar senha" type="password" value={confirmar}
-              onChange={setConfirmar} placeholder="••••••" />
-          )}
-
-          {erro && (
-            <div style={{ background: "rgba(192,57,43,0.08)", border: `1px solid ${C.vermelho}44`,
-              borderRadius: "8px", padding: "10px 12px", marginBottom: "16px",
-              color: C.vermelho, fontSize: "12px", textAlign: "center" }}>
-              {erro}
-            </div>
-          )}
-
-          <Btn onClick={modo === "login" ? handleLogin : handleCadastro} disabled={carregando}>
-            {carregando ? "Aguarde..." : modo === "login" ? "ENTRAR" : "CADASTRAR"}
-          </Btn>
-          <Btn outline onClick={alternarModo} disabled={carregando}>
-            {modo === "login" ? "Criar conta" : "Já tenho conta"}
-          </Btn>
-        </div>
+        <Btn onClick={modo === "login" ? handleLogin : handleCadastro} disabled={carregando}>
+          {carregando ? "Aguarde..." : modo === "login" ? "ENTRAR" : "CADASTRAR"}
+        </Btn>
+        <Btn outline onClick={alternarModo} disabled={carregando}>
+          {modo === "login" ? "CRIAR CONTA" : "JÁ TENHO CONTA"}
+        </Btn>
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: `1px solid ${C.borda}`, padding: "12px 16px", textAlign: "center",
-        fontSize: "9px", color: C.sub, letterSpacing: "0.5px" }}>
-        Desenvolvido por <strong style={{ color: C.verde }}>Cap Cav Arlison Andrade do Vale</strong>
-        {" "}· Seção de Equitação · ESA · 2026
+      <div style={{ marginTop: "24px", textAlign: "center", fontSize: "9px",
+        color: "rgba(255,255,255,0.3)", letterSpacing: "0.5px" }}>
+        Cap Cav Arlison Andrade do Vale · Seção de Equitação · ESA · 2026
       </div>
     </div>
   );
