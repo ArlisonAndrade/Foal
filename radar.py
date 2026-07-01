@@ -1,7 +1,11 @@
 import requests
 import json
+import os
+import dotenv # type: ignore
 
-NOTION_API_KEY = "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"
+dotenv.load_dotenv()
+
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 HEADERS = {
     "Authorization": f"Bearer {NOTION_API_KEY}",
     "Content-Type": "application/json",
