@@ -13,11 +13,5 @@
       "runtimeArgs": ["run", "preview"],
       "port": 4173
     }
-  ,{
-      "name": "FOAL Protótipo",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["serve-proto.js"],
-      "port": 3031
-    }
   ]
 }
