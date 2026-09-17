@@ -12,6 +12,10 @@ import {
 } from "./cenarios.js";
 
 // ─── CONSTANTES ──────────────────────────────────────────────
+// Vazio = mesma origem (producao na Vercel). Em dev local, defina
+// VITE_API_BASE no .env.local para apontar para um deploy com /api.
+const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+
 const PIN_ADMIN = "2311";
 
 const C = {
@@ -1135,8 +1139,8 @@ function AppAutenticado() {
                 };
               });
 
-              // Dispara via POST para o endereço de produção da Vercel
-              const resp = await fetch("https://foal-app.vercel.app/api/salvar", {
+              // Dispara via POST para a Serverless Function de gravação
+              const resp = await fetch(`${API_BASE}/api/salvar`, {
                 method: "POST", 
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ registros }),
