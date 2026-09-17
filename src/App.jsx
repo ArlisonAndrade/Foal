@@ -3,6 +3,11 @@ import { signOut } from "firebase/auth";
 import { auth } from "./firebase.js";
 import { useAuth } from "./AuthContext.jsx";
 import TelaLogin from "./TelaLogin.jsx";
+import TelaBloqueio from "./TelaBloqueio.jsx";
+import {
+  suportaBiometria, biometriaAtiva, estaDestravado,
+  cadastrarBiometria, desativarBiometria, travar,
+} from "./biometria.js";
 import { LOGOS } from "./logos.js";
 import { CURSOS, ATLETAS } from "./dados.js";
 import {
@@ -177,8 +182,56 @@ const appInicial = () => ({
   instrutor: "",
 });
 
+// Só aparece em aparelho com biometria de plataforma (Face ID, desbloqueio
+// facial do Android, Windows Hello). Em notebook sem sensor, nem renderiza.
+const AlternarBiometria = ({ user }) => {
+  const [suportado, setSuportado] = useState(false);
+  const [ativa, setAtiva]         = useState(() => biometriaAtiva(user.uid));
+  const [ocupado, setOcupado]     = useState(false);
+  const [erro, setErro]           = useState("");
+
+  useEffect(() => { let vivo = true; suportaBiometria().then(r => vivo && setSuportado(r));
+    return () => { vivo = false; }; }, []);
+
+  if (!suportado) return null;
+
+  const alternar = async () => {
+    setErro("");
+    setOcupado(true);
+    try {
+      if (ativa) { desativarBiometria(user.uid); setAtiva(false); }
+      else { await cadastrarBiometria(user); setAtiva(true); }
+    } catch (e) {
+      setErro(e.message);
+    } finally {
+      setOcupado(false);
+    }
+  };
+
+  return (
+    <div style={{ marginBottom: "12px" }}>
+      <button onClick={alternar} disabled={ocupado} style={{
+        background: ativa ? "rgba(194,162,79,0.14)" : "transparent",
+        border: `1px solid ${ativa ? C.ouro + "66" : "rgba(255,255,255,0.2)"}`,
+        borderRadius: "8px", padding: "7px 18px", fontSize: "10px",
+        color: ativa ? C.ouro : "rgba(255,255,255,0.45)",
+        cursor: ocupado ? "wait" : "pointer", letterSpacing: "1.6px", textTransform: "uppercase",
+        display: "inline-flex", alignItems: "center", gap: "7px",
+      }}>
+        <Ico name={ativa ? "check" : "lock"} size={12} w={2} />
+        {ocupado ? "Aguarde..." : ativa ? "Entrada facial ativa" : "Ativar entrada facial"}
+      </button>
+      {erro && (
+        <div style={{ fontSize: "10px", color: "#e8a79f", marginTop: "7px", maxWidth: "260px",
+          marginLeft: "auto", marginRight: "auto" }}>{erro}</div>
+      )}
+    </div>
+  );
+};
+
 export default function App() {
   const { user } = useAuth();
+  const [destravado, setDestravado] = useState(false);
 
   if (user === undefined) return (
     <div style={{ minHeight: "100vh", background: "#eceae2", display: "flex",
@@ -188,6 +241,11 @@ export default function App() {
   );
 
   if (user === null) return <TelaLogin />;
+
+  // Sessao do Firebase persiste no aparelho; se o instrutor ativou o
+  // bloqueio, o rosto e o que revela o app a cada abertura.
+  if (biometriaAtiva(user.uid) && !estaDestravado(user.uid) && !destravado)
+    return <TelaBloqueio user={user} aoDestravar={() => setDestravado(true)} />;
 
   return <AppAutenticado />;
 }
@@ -264,7 +322,8 @@ function AppAutenticado() {
         <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "10px", letterSpacing: "0.5px" }}>
           {user.displayName || user.email}
         </div>
-        <button onClick={() => signOut(auth)} style={{
+        <AlternarBiometria user={user} />
+        <button onClick={() => { travar(user.uid); signOut(auth); }} style={{
           background: "transparent", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "8px",
           padding: "7px 20px", fontSize: "10px", color: "rgba(255,255,255,0.45)",
           cursor: "pointer", letterSpacing: "2px", textTransform: "uppercase",
