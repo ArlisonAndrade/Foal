@@ -1,4 +1,21 @@
-.vercel
+# dependencias
 node_modules/
+
+# build
 dist/
+
+# ambiente
 .env
+.env.local
+.env.*.local
+
+# plataformas / editores
+.vercel
+.claude/settings.local.json
+.DS_Store
+Thumbs.db
+
+# python (tools/)
+__pycache__/
+*.pyc
+.venv/
