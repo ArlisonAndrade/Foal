@@ -63,6 +63,28 @@ _Settings → Environment Variables_.
 A config do Firebase em `src/firebase.js` é pública por design (chave de client);
 a proteção real vem das regras do Firebase, não do sigilo dessa chave.
 
+## Login
+
+`TelaLogin.jsx` é um `<form>` de verdade, com `name`, `id`, `<label for>` e
+`autocomplete` em todos os campos. **Isso não é enfeite:** é o que faz o
+gerenciador de senhas do celular oferecer salvar e preencher a credencial — e é
+o autofill que permite ao iOS/Android liberar o preenchimento com Face ID ou
+digital. Tirar esses atributos quebra o login fácil no celular sem quebrar teste
+nenhum, então cuidado ao mexer.
+
+- `autocomplete="username"` no e-mail e `current-password` na senha (no cadastro
+  vira `new-password`, para o gerenciador sugerir uma senha nova em vez de
+  preencher a antiga).
+- Exatamente um botão `type="submit"`; os demais são `type="button"`, senão
+  qualquer clique enviaria o formulário.
+- `inputMode="email"`, `autoCapitalize="none"`, `autoCorrect="off"` — teclado de
+  celular parando de atrapalhar.
+- **Esqueci minha senha** via `sendPasswordResetEmail`. Sem isso, quem esquece a
+  senha fica travado para fora do app.
+
+A sessão do Firebase persiste no aparelho (`browserLocalPersistence`, o padrão),
+então quem entrou continua entrando direto até tocar em "Sair".
+
 ## Build e deploy
 
 ```bash

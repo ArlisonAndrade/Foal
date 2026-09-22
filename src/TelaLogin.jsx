@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   updateProfile,
 } from "firebase/auth";
 import { auth } from "./firebase.js";
@@ -20,15 +21,26 @@ const C = {
   vermelho:"#c0392b",
 };
 
-const Input = ({ label, type = "text", value, onChange, placeholder }) => (
+// name + autoComplete + id sao o que faz o gerenciador de senhas do celular
+// oferecer salvar e preencher. Sem eles nao ha autofill — e e o autofill que
+// deixa o iOS/Android liberar o preenchimento com Face ID / digital.
+const Input = ({ label, type = "text", value, onChange, placeholder,
+                 nome, autoComplete, inputMode }) => (
   <div style={{ marginBottom: "16px" }}>
-    <div style={{ fontSize: "10px", letterSpacing: "0.14em", textTransform: "uppercase",
-      color: C.ouro, fontWeight: "600", marginBottom: "7px" }}>{label}</div>
+    <label htmlFor={nome} style={{ display: "block", fontSize: "10px", letterSpacing: "0.14em",
+      textTransform: "uppercase", color: C.ouro, fontWeight: "600", marginBottom: "7px" }}>{label}</label>
     <input
+      id={nome}
+      name={nome}
       type={type}
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
+      autoComplete={autoComplete}
+      inputMode={inputMode}
+      autoCapitalize="none"
+      autoCorrect="off"
+      spellCheck="false"
       style={{
         width: "100%", boxSizing: "border-box",
         border: `1px solid ${C.borda}`, borderRadius: "9px",
@@ -39,8 +51,8 @@ const Input = ({ label, type = "text", value, onChange, placeholder }) => (
   </div>
 );
 
-const Btn = ({ children, onClick, disabled, outline }) => (
-  <button onClick={onClick} disabled={disabled} style={{
+const Btn = ({ children, onClick, disabled, outline, type = "button" }) => (
+  <button type={type} onClick={onClick} disabled={disabled} style={{
     width: "100%", border: outline ? `1.5px solid ${C.verde2}` : "none",
     background: outline ? "transparent" : disabled ? "#cfcdc4" : C.verde2,
     color: outline ? C.verde2 : "#fff",
@@ -74,14 +86,35 @@ export default function TelaLogin() {
   const [senha, setSenha] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [erro, setErro] = useState("");
+  const [aviso, setAviso] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  const limpar = () => { setErro(""); };
+  const limpar = () => { setErro(""); setAviso(""); };
 
   const alternarModo = () => {
     setModo(m => m === "login" ? "cadastro" : "login");
-    setErro("");
-    setNome(""); setEmail(""); setSenha(""); setConfirmar("");
+    limpar();
+    setNome(""); setSenha(""); setConfirmar("");
+  };
+
+  // Sem isto, quem esquece a senha fica travado para fora do app.
+  const handleReset = async () => {
+    limpar();
+    if (!email) { setErro("Digite seu e-mail para receber o link."); return; }
+    setCarregando(true);
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setAviso("Link de redefinicao enviado. Confira seu e-mail.");
+    } catch (e) {
+      setErro(msgErro(e.code));
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (modo === "login") handleLogin(); else handleCadastro();
   };
 
   const handleLogin = async () => {
@@ -133,9 +166,10 @@ export default function TelaLogin() {
         </div>
       </div>
 
-      {/* Card de auth */}
-      <div style={{ width: "100%", maxWidth: "380px", background: "#f6f5ef", borderRadius: "16px",
-        padding: "28px 24px 20px" }}>
+      {/* Card de auth — <form> de verdade: e o que faz o teclado do celular
+          mostrar "ir" e o gerenciador de senhas oferecer salvar a credencial. */}
+      <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: "380px",
+        background: "#f6f5ef", borderRadius: "16px", padding: "28px 24px 20px" }}>
 
         <div style={{ fontSize: "9px", letterSpacing: "3px", textTransform: "uppercase",
           color: C.ouro, fontWeight: "700", marginBottom: "20px", textAlign: "center" }}>
@@ -143,13 +177,18 @@ export default function TelaLogin() {
         </div>
 
         {modo === "cadastro" && (
-          <Input label="Nome completo" value={nome} onChange={setNome} placeholder="Seu nome" />
+          <Input label="Nome completo" value={nome} onChange={setNome} placeholder="Seu nome"
+            nome="name" autoComplete="name" />
         )}
-        <Input label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" />
-        <Input label="Senha" type="password" value={senha} onChange={setSenha} placeholder="••••••" />
+        <Input label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com"
+          nome="email" autoComplete="username" inputMode="email" />
+        <Input label="Senha" type="password" value={senha} onChange={setSenha} placeholder="••••••"
+          nome="password"
+          autoComplete={modo === "login" ? "current-password" : "new-password"} />
         {modo === "cadastro" && (
           <Input label="Confirmar senha" type="password" value={confirmar}
-            onChange={setConfirmar} placeholder="••••••" />
+            onChange={setConfirmar} placeholder="••••••"
+            nome="confirm-password" autoComplete="new-password" />
         )}
 
         {erro && (
@@ -160,13 +199,31 @@ export default function TelaLogin() {
           </div>
         )}
 
-        <Btn onClick={modo === "login" ? handleLogin : handleCadastro} disabled={carregando}>
+        {aviso && (
+          <div style={{ background: "rgba(30,132,73,0.08)", border: "1px solid #1e844944",
+            borderRadius: "8px", padding: "10px 12px", marginBottom: "16px",
+            color: "#1e8449", fontSize: "12px", textAlign: "center" }}>
+            {aviso}
+          </div>
+        )}
+
+        <Btn type="submit" disabled={carregando}>
           {carregando ? "Aguarde..." : modo === "login" ? "ENTRAR" : "CADASTRAR"}
         </Btn>
         <Btn outline onClick={alternarModo} disabled={carregando}>
           {modo === "login" ? "CRIAR CONTA" : "JÁ TENHO CONTA"}
         </Btn>
-      </div>
+
+        {modo === "login" && (
+          <button type="button" onClick={handleReset} disabled={carregando} style={{
+            width: "100%", background: "transparent", border: "none", padding: "6px 0 2px",
+            color: C.sub, fontSize: "11px", fontFamily: "inherit", textDecoration: "underline",
+            cursor: carregando ? "not-allowed" : "pointer",
+          }}>
+            Esqueci minha senha
+          </button>
+        )}
+      </form>
 
       {/* Footer */}
       <div style={{ marginTop: "24px", textAlign: "center", fontSize: "9px",
