@@ -63,46 +63,6 @@ _Settings → Environment Variables_.
 A config do Firebase em `src/firebase.js` é pública por design (chave de client);
 a proteção real vem das regras do Firebase, não do sigilo dessa chave.
 
-## Entrada facial (biometria)
-
-No celular, o instrutor pode ativar **"entrar com o rosto"** no rodapé da tela
-inicial. A partir daí, abrir o app pede Face ID / desbloqueio facial do Android
-em vez da senha.
-
-Como funciona (`src/biometria.js`, `src/TelaBloqueio.jsx`):
-
-- Usa **WebAuthn com autenticador de plataforma**. O dado biométrico nunca sai do
-  aparelho — o navegador devolve só uma assinatura criptográfica. Nenhum dado
-  facial passa pelo nosso código nem pelo Notion.
-- O `rp.id` é **omitido de propósito**, então o navegador usa o domínio atual.
-  Isso faz o mesmo código funcionar em `localhost` e em `foal-app.vercel.app`.
-- O credential ID fica em `localStorage` por `uid`; o estado "destravado" fica em
-  `sessionStorage`, então recarregar a página no meio de uma avaliação não
-  reinterroga, mas fechar e reabrir o app sim.
-- O botão só aparece em aparelho com biometria de plataforma disponível. Em
-  notebook sem sensor, nem renderiza — e a senha continua sendo o caminho.
-
-### Limite importante
-
-Isto é um **cadeado local sobre a sessão do Firebase**, não uma fronteira de
-autenticação. Não existe servidor verificando a assertion (o Firebase não tem
-provider de passkey nativo), então o desafio é gerado no próprio cliente.
-
-Na prática: protege contra o cenário real — celular desbloqueado na mão de outra
-pessoa — mas não contra alguém com devtools abertos no aparelho. Quem autoriza de
-verdade continua sendo a sessão do Firebase.
-
-Para transformar isso numa autenticação de verdade seria preciso uma Serverless
-Function rodando a cerimônia WebAuthn com o Firebase Admin SDK, emitindo custom
-tokens — o que exige um service account guardado na Vercel.
-
-### Se o domínio mudar
-
-As credenciais WebAuthn são amarradas ao domínio. Migrar de `foal-app.vercel.app`
-para um domínio próprio **invalida todas as biometrias cadastradas** e cada
-instrutor precisa reativar. Nada quebra — o app cai no login por senha — mas vale
-avisar antes.
-
 ## Build e deploy
 
 ```bash
